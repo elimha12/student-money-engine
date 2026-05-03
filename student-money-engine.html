@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Money Engine — The Complete Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0b0b0c;
+    --bg-soft: #131316;
+    --bg-card: #17171b;
+    --ink: #f5f3ee;
+    --ink-dim: #a9a59c;
+    --ink-faint: #6b6962;
+    --accent: #e8ff5b;
+    --accent-dim: #c4d74a;
+    --accent-warm: #ff7a45;
+    --line: #2a2a30;
+    --line-soft: #1e1e22;
+    --ok: #7ee787;
+    --warn: #ffb454;
+    --danger: #ff6b6b;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter Tight', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  /* ========== LAYOUT ========== */
+  .shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } }
+
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+    background: var(--bg-soft);
+    border-right: 1px solid var(--line);
+    padding: 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  @media (max-width: 900px) { .sidebar { position: relative; height: auto; } }
+
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .brand em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .brand-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .nav-section {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 24px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-link {
+    display: block;
+    color: var(--ink-dim);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 0;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .nav-link:hover { color: var(--accent); transform: translateX(3px); }
+  .nav-link .num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-right: 8px;
+  }
+
+  /* ========== MAIN ========== */
+  .main { padding: 0; }
+  .container { max-width: 820px; margin: 0 auto; padding: 60px 40px 120px; }
+  @media (max-width: 700px) { .container { padding: 40px 20px 80px; } }
+
+  /* ========== HERO ========== */
+  .hero {
+    background: linear-gradient(135deg, #0b0b0c 0%, #1a1a1f 100%);
+    padding: 80px 40px 100px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(232, 255, 91, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 820px; margin: 0 auto; position: relative; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 7vw, 84px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 28px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .hero-lede {
+    font-size: 19px;
+    color: var(--ink-dim);
+    max-width: 620px;
+    line-height: 1.55;
+    margin-bottom: 40px;
+  }
+  .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* ========== SECTIONS ========== */
+  .chapter {
+    margin-bottom: 100px;
+    padding-top: 40px;
+  }
+  .chapter-head {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .chapter-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .chapter-head h2 {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .chapter-head h2 em { font-style: italic; font-weight: 400; }
+
+  .lesson {
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .lesson:last-child { border-bottom: none; }
+  .lesson-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+  .lesson h3 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+  .lesson h4 {
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 28px 0 12px;
+    letter-spacing: -0.005em;
+  }
+  .lesson p { margin-bottom: 16px; color: var(--ink-dim); }
+  .lesson p strong { color: var(--ink); font-weight: 600; }
+  .lesson ul, .lesson ol { margin: 12px 0 20px 22px; color: var(--ink-dim); }
+  .lesson li { margin-bottom: 8px; }
+  .lesson li strong { color: var(--ink); }
+  .lesson a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  .lesson a:hover { border-bottom-color: var(--accent); }
+
+  /* ========== CALLOUTS ========== */
+  .callout {
+    background: var(--bg-card);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout-warn { border-left-color: var(--warn); }
+  .callout-danger { border-left-color: var(--danger); }
+  .callout-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .callout-warn .callout-tag { color: var(--warn); }
+  .callout-danger .callout-tag { color: var(--danger); }
+  .callout p { margin-bottom: 0; color: var(--ink); font-size: 15px; }
+
+  /* ========== SERVICE CARDS ========== */
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .service-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .service-card:hover { border-color: var(--accent); }
+  .service-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 16px;
+  }
+  .service-card h4 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .service-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(232, 255, 91, 0.08);
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .service-desc { color: var(--ink-dim); font-size: 14px; margin-bottom: 16px; line-height: 1.55; }
+  .service-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .meta-item { }
+  .meta-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .meta-value {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .meta-value.price { color: var(--accent); font-family: var(--font-mono); }
+
+  /* Difficulty dots */
+  .diff { display: inline-flex; gap: 3px; align-items: center; }
+  .diff-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .diff-dot.on { background: var(--accent); }
+
+  /* ========== TABLES ========== */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 10px; border: 1px solid var(--line); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+  th {
+    background: var(--bg-card);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  td { color: var(--ink-dim); }
+  td strong { color: var(--ink); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ========== SCRIPT BLOCKS ========== */
+  .script {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .script-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .script-body { color: var(--ink-dim); font-family: var(--font-body); font-size: 14px; white-space: normal; }
+  .script-note {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  /* ========== QUIZ ========== */
+  .quiz-q {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+  .quiz-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+  .quiz-text {
+    font-size: 16px;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--ink-dim);
+  }
+  .quiz-letter {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(232, 255, 91, 0.08);
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  .quiz-pts {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ========== ACTION BOX ========== */
+  .action-box {
+    background: linear-gradient(135deg, rgba(232, 255, 91, 0.06), rgba(232, 255, 91, 0.02));
+    border: 1px solid rgba(232, 255, 91, 0.2);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .action-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .action-box ul { margin-left: 20px; }
+  .action-box li { color: var(--ink); margin-bottom: 6px; }
+
+  /* ========== FOOTER ========== */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+  footer .brand-foot {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  /* ========== UTIL ========== */
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 32px 0;
+  }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-dim);
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 15px;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: '→ ';
+    color: var(--accent);
+    font-family: var(--font-mono);
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  details[open] summary { margin-bottom: 12px; }
+
+  /* ========== LINK PROMO BLOCK ========== */
+  .promo {
+    background: linear-gradient(135deg, rgba(232, 255, 91, 0.08), rgba(232, 255, 91, 0.02));
+    border: 1px solid rgba(232, 255, 91, 0.25);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .promo::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(232, 255, 91, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .promo-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+    position: relative;
+  }
+  .promo h4 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    position: relative;
+  }
+  .promo h4 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .promo p {
+    color: var(--ink-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0 0 18px;
+    position: relative;
+  }
+  .promo-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+  }
+  .promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--bg) !important;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: -0.005em;
+  }
+  .promo-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(232, 255, 91, 0.25);
+    border-bottom: none !important;
+  }
+  .promo-btn.secondary {
+    background: transparent;
+    color: var(--accent) !important;
+    border: 1px solid rgba(232, 255, 91, 0.4);
+  }
+  .promo-btn.secondary:hover {
+    background: rgba(232, 255, 91, 0.06);
+  }
+  .promo-btn .arrow {
+    font-family: var(--font-mono);
+    font-weight: 400;
+  }
+
+  /* Compact inline version for chapter intros */
+  .promo-mini {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: var(--ink-dim);
+  }
+  .promo-mini strong { color: var(--ink); font-weight: 600; }
+  .promo-mini a {
+    color: var(--accent) !important;
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232, 255, 91, 0.3);
+  }
+  .promo-mini a:hover { border-bottom-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ========================================================== -->
+  <!-- SIDEBAR NAVIGATION -->
+  <!-- ========================================================== -->
+  <aside class="sidebar">
+    <div class="brand">Student<br>Money <em>Engine</em></div>
+    <div class="brand-sub">The Complete Course · 2026</div>
+
+    <div class="nav-section">Getting Started</div>
+    <a href="#intro" class="nav-link"><span class="num">00</span>Welcome & How to Use</a>
+
+    <div class="nav-section">Chapter 1 · The Map</div>
+    <a href="#l1-1" class="nav-link"><span class="num">1.1</span>What is a Micro-Service?</a>
+    <a href="#l1-2" class="nav-link"><span class="num">1.2</span>The 20 Services</a>
+    <a href="#l1-3" class="nav-link"><span class="num">1.3</span>How to Choose</a>
+
+    <div class="nav-section">Chapter 2 · Your Profile</div>
+    <a href="#l2-1" class="nav-link"><span class="num">2.1</span>Technical Types</a>
+    <a href="#l2-2" class="nav-link"><span class="num">2.2</span>Creative Types</a>
+    <a href="#l2-3" class="nav-link"><span class="num">2.3</span>Communicator Types</a>
+    <a href="#l2-4" class="nav-link"><span class="num">2.4</span>Low-Time Students</a>
+
+    <div class="nav-section">Chapter 3 · Week 1</div>
+    <a href="#l3-1" class="nav-link"><span class="num">3.1</span>Free Resources</a>
+    <a href="#l3-2" class="nav-link"><span class="num">3.2</span>Tool Setup Guide</a>
+    <a href="#l3-3" class="nav-link"><span class="num">3.3</span>Day 1 Checklist</a>
+
+    <div class="nav-section">Chapter 4 · Week 2</div>
+    <a href="#l4-1" class="nav-link"><span class="num">4.1</span>Practice Projects</a>
+    <a href="#l4-2" class="nav-link"><span class="num">4.2</span>Quality Control</a>
+    <a href="#l4-3" class="nav-link"><span class="num">4.3</span>Real Examples</a>
+
+    <div class="nav-section">Chapter 5 · Week 3</div>
+    <a href="#l5-1" class="nav-link"><span class="num">5.1</span>Why a Portfolio</a>
+    <a href="#l5-2" class="nav-link"><span class="num">5.2</span>Templates</a>
+    <a href="#l5-3" class="nav-link"><span class="num">5.3</span>Free Platforms</a>
+
+    <div class="nav-section">Chapter 6 · Week 4</div>
+    <a href="#l6-1" class="nav-link"><span class="num">6.1</span>Finding 10 Clients</a>
+    <a href="#l6-2" class="nav-link"><span class="num">6.2</span>Cold DM Scripts</a>
+    <a href="#l6-3" class="nav-link"><span class="num">6.3</span>Cold Email Templates</a>
+    <a href="#l6-4" class="nav-link"><span class="num">6.4</span>LinkedIn Playbook</a>
+    <a href="#l6-5" class="nav-link"><span class="num">6.5</span>Follow-Up System</a>
+
+    <div class="nav-section">Chapter 7 · Pricing</div>
+    <a href="#l7-1" class="nav-link"><span class="num">7.1</span>Starter Pricing</a>
+    <a href="#l7-2" class="nav-link"><span class="num">7.2</span>Value-Based</a>
+    <a href="#l7-3" class="nav-link"><span class="num">7.3</span>Retainers</a>
+    <a href="#l7-4" class="nav-link"><span class="num">7.4</span>Raising Prices</a>
+
+    <div class="nav-section">Chapter 8 · Scaling</div>
+    <a href="#l8-1" class="nav-link"><span class="num">8.1</span>1 to 10 Clients</a>
+    <a href="#l8-2" class="nav-link"><span class="num">8.2</span>School + Work</a>
+    <a href="#l8-3" class="nav-link"><span class="num">8.3</span>Productize It</a>
+
+    <div class="nav-section">Tools & Files</div>
+    <a href="#quiz" class="nav-link"><span class="num">Q</span>20-Question Quiz</a>
+    <a href="#files" class="nav-link"><span class="num">F</span>Template Files</a>
+
+    <div class="nav-section">Recommended</div>
+    <a href="https://getcareergps.com" target="_blank" rel="noopener" class="nav-link" style="color: var(--accent);"><span class="num">★</span>Career GPS</a>
+    <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" class="nav-link"><span class="num">→</span>Buy on Gumroad</a>
+  </aside>
+
+  <main class="main">
+
+    <!-- ========================================================== -->
+    <!-- HERO -->
+    <!-- ========================================================== -->
+    <section class="hero" id="intro">
+      <div class="hero-inner">
+        <div class="eyebrow">A Whop Course · 8 Chapters · 30 Lessons</div>
+        <h1>Turn your study hours into <em>real income</em>.</h1>
+        <p class="hero-lede">A 30-day system that helps college students pick the right online micro-service, learn it from free resources, build a portfolio, and land their first paying client — without dropping out, selling a course, or chasing get-rich-quick schemes.</p>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">20</div>
+            <div class="stat-label">Micro-Services</div>
+          </div>
+          <div>
+            <div class="stat-num">30</div>
+            <div class="stat-label">Lessons</div>
+          </div>
+          <div>
+            <div class="stat-num">30</div>
+            <div class="stat-label">Day Blueprint</div>
+          </div>
+          <div>
+            <div class="stat-num">5</div>
+            <div class="stat-label">Template Files</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- ========================================================== -->
+      <!-- TOP PROMO -->
+      <!-- ========================================================== -->
+      <div class="promo">
+        <div class="promo-tag">★ Before You Start</div>
+        <h4>Not sure if your major is the <em>right</em> one?</h4>
+        <p>Picking the right side-hustle is one decision. Picking the right career is a much bigger one. Career GPS is a tool that builds you a personalized 12-month roadmap based on your strengths, interests, and current path — built for students who suspect their degree might not be the right fit.</p>
+        <div class="promo-links">
+          <a href="https://getcareergps.com" target="_blank" rel="noopener" class="promo-btn">Try Career GPS <span class="arrow">→</span></a>
+          <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" class="promo-btn secondary">Get it on Gumroad <span class="arrow">→</span></a>
+        </div>
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- WELCOME / HOW TO USE -->
+      <!-- ========================================================== -->
+      <section class="lesson" id="welcome">
+        <div class="lesson-num">00 · WELCOME</div>
+        <h3>How to actually use this course</h3>
+        <p>This isn't a library of videos you'll forget about. It's a <strong>single 30-day sprint</strong>: one chapter per week, plus a weekly tracker to keep you honest. If you follow the schedule — even at 80% — you will have your first paying client inside 30 days.</p>
+
+        <h4>The simple weekly rhythm</h4>
+        <ul>
+          <li><strong>Week 1 — Learn.</strong> Pick one service. Consume the curated free resources. Nothing else.</li>
+          <li><strong>Week 2 — Practice.</strong> Do three projects for imaginary clients. Ship real work.</li>
+          <li><strong>Week 3 — Portfolio.</strong> Package your three pieces on a simple page.</li>
+          <li><strong>Week 4 — Outreach.</strong> Send 100 messages. Close one client.</li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-tag">One rule</div>
+          <p>Don't skip to Chapter 6. Students who jump straight to client outreach without a portfolio close at under 2%. Students with a portfolio close at 8–12%. The order matters.</p>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 1 -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch1">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 01 · The Micro-Service Map</div>
+          <h2>Pick the <em>right</em> game before you play it.</h2>
+        </div>
+
+        <!-- LESSON 1.1 -->
+        <article class="lesson" id="l1-1">
+          <div class="lesson-num">LESSON 1.1</div>
+          <h3>What is a micro-service, and why is it perfect for students?</h3>
+
+          <p>A <strong>micro-service</strong> is a small, well-defined piece of work you can do online, in under 10 hours per project, for a business or creator. Think: editing one podcast episode, setting up one Notion workspace, clipping one week of short-form video, building one landing page.</p>
+
+          <p>It sits in a narrow gap that's perfect for a college student's life:</p>
+          <ul>
+            <li><strong>Smaller than freelancing.</strong> You're not taking on an entire brand identity or a six-month contract. You're selling one task, over and over.</li>
+            <li><strong>Bigger than gig work.</strong> You're not driving Uber at 2 a.m. for $11 an hour. You're selling a skill that compounds, at a rate that grows every month.</li>
+            <li><strong>Faster than a startup.</strong> You don't need a co-founder, funding, or an LLC. You need a laptop, a Stripe account, and one client.</li>
+          </ul>
+
+          <h4>Why it fits a student's life specifically</h4>
+          <p>Your schedule is already fragmented — two-hour gaps between classes, a free evening here, a quiet Sunday there. Micro-services fit that shape. A standard project is 4–8 hours. You can deliver a full one in a weekend. You're not saying "sorry, I have a midterm" for six weeks straight.</p>
+
+          <p>The other thing college gives you: <strong>time to be bad at something.</strong> A 34-year-old with a mortgage can't spend 20 hours learning CapCut transitions. You can. The worst case is that you learn a skill that looks good on a LinkedIn profile. The best case is that you're making $2,000–$5,000 a month by graduation, with zero debt added.</p>
+
+          <h4>What micro-services are not</h4>
+          <p>They're not dropshipping. They're not affiliate marketing. They're not "make $10K/month on autopilot." They're a trade — you do skilled work, someone pays you. The skills are real, the clients are real, and the money transfers the same way a paycheck does. <strong>You're building a service business, not a get-rich-quick funnel.</strong></p>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Reality check</div>
+            <p>Your first month is usually zero or one client. Your second month is 2–3. Your third month is when the math starts working. If you need $800 tomorrow, a micro-service won't get you there. A shift at Target will. This is a 90-day horizon, not a 9-day one.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 1.2 - THE 20 SERVICES -->
+        <article class="lesson" id="l1-2">
+          <div class="lesson-num">LESSON 1.2</div>
+          <h3>The 20 best micro-services for students in 2026</h3>
+
+          <p>These are ranked roughly by accessibility — the ones at the top take the least experience to land a first client. Every one of these has active demand right now on Upwork, Fiverr, Contra, and Twitter/X. <strong>Pick one</strong>, not three.</p>
+
+          <div class="service-grid">
+
+            <!-- 1 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Short-Form Video Clipping</h4>
+                <span class="service-num">01</span>
+              </div>
+              <p class="service-desc">Turn a creator's long podcast or YouTube video into 10–15 vertical clips for TikTok, Reels, and Shorts. One of the fastest-growing service categories since 2024.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">CapCut, Opus Clip</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">1–2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$300–$1,500/mo</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Thumbnail Design</h4>
+                <span class="service-num">02</span>
+              </div>
+              <p class="service-desc">Design high-CTR YouTube thumbnails for creators. Every serious channel needs 2–8 per month. Retainer-friendly, highly visual, easy to show off.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Photoshop, Figma</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2–3 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$40–$150 each</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3K</div></div>
+              </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Notion Workspace Setup</h4>
+                <span class="service-num">03</span>
+              </div>
+              <p class="service-desc">Build custom Notion systems for solopreneurs, small teams, and creators — CRMs, content calendars, second brains, project trackers.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Notion (free)</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$200–$1,200 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3.5K</div></div>
+              </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>AI Automation Setup</h4>
+                <span class="service-num">04</span>
+              </div>
+              <p class="service-desc">Use Zapier, Make, or n8n to connect a client's tools — auto-send emails, sync CRMs, parse forms. One of the highest-paying beginner services.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Zapier, Make, n8n</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3–4 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$500–$3,000 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$3K–$6K</div></div>
+              </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Website Editing (Webflow / Framer)</h4>
+                <span class="service-num">05</span>
+              </div>
+              <p class="service-desc">Edit or build landing pages and small marketing sites in Webflow, Framer, or WordPress. High ceiling for someone with visual taste.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Webflow, Framer</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3–4 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$400–$2,500 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$5K</div></div>
+              </div>
+            </div>
+
+            <!-- 6 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Podcast Editing</h4>
+                <span class="service-num">06</span>
+              </div>
+              <p class="service-desc">Clean audio, remove ums, add music and transitions, export show notes. Weekly work = predictable monthly income, and podcasters rarely switch editors.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Descript, Audacity</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$80–$300/episode</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3K</div></div>
+              </div>
+            </div>
+
+            <!-- 7 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Social Media Management</h4>
+                <span class="service-num">07</span>
+              </div>
+              <p class="service-desc">Run a small business's Instagram, LinkedIn, or TikTok — post scheduling, caption writing, engagement, simple content. Classic retainer service.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Buffer, Canva, Later</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$500–$2,000/mo</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 8 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Newsletter Ghostwriting</h4>
+                <span class="service-num">08</span>
+              </div>
+              <p class="service-desc">Write weekly or biweekly newsletters for founders, coaches, and creators. Beehiiv and Substack creators often outsource this to students.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Beehiiv, Substack</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2–3 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$200–$600/issue</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 9 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Lead Generation</h4>
+                <span class="service-num">09</span>
+              </div>
+              <p class="service-desc">Build targeted lead lists (verified emails, LinkedIn profiles, phone numbers) for B2B sales teams. Repeatable, scalable, zero creative pressure.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Apollo, Instantly</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">1–2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$0.20–$1/lead</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3K</div></div>
+              </div>
+            </div>
+
+            <!-- 10 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Data Scraping</h4>
+                <span class="service-num">10</span>
+              </div>
+              <p class="service-desc">Extract structured data from websites — e-commerce prices, directory listings, competitor info. Technical but well-paid. Stay on the right side of ToS.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Python, Octoparse</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">4 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$200–$1,500 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 11 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Cold Email Infrastructure</h4>
+                <span class="service-num">11</span>
+              </div>
+              <p class="service-desc">Set up multi-domain cold email systems for agencies and sales teams — domain warmup, inbox rotation, deliverability. Huge demand, few providers.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Instantly, Smartlead</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$500–$2,500 setup</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$3K–$5K</div></div>
+              </div>
+            </div>
+
+            <!-- 12 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>UGC Creation</h4>
+                <span class="service-num">12</span>
+              </div>
+              <p class="service-desc">Create "authentic-looking" TikTok and Reels content for brands — you film, they use it in ads. No follower count needed. Highly accessible for Gen Z.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Phone, ring light</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$150–$500/video</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 13 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Virtual Assistant (Niche)</h4>
+                <span class="service-num">13</span>
+              </div>
+              <p class="service-desc">Not generic VA work — pick a niche (real estate, coaches, agency owners) and specialize. Predictable hours, high retention, easy entry.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Gmail, Notion, Slack</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">1 week</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$15–$35/hr</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.2K–$2.5K</div></div>
+              </div>
+            </div>
+
+            <!-- 14 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Resume & LinkedIn Optimization</h4>
+                <span class="service-num">14</span>
+              </div>
+              <p class="service-desc">Rewrite resumes and LinkedIn profiles for job seekers and mid-career professionals. You already understand the US job market — monetize that.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Google Docs, Canva</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$100–$400 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3K</div></div>
+              </div>
+            </div>
+
+            <!-- 15 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>SEO Blog Writing</h4>
+                <span class="service-num">15</span>
+              </div>
+              <p class="service-desc">Write keyword-optimized blog posts for SaaS companies and agencies. AI handles drafts now — your job is structure, research, and voice.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Surfer, Ahrefs</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$150–$500/article</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 16 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Logo & Brand Micro-Design</h4>
+                <span class="service-num">16</span>
+              </div>
+              <p class="service-desc">Simple logo sets + brand basics (colors, one font pairing, social banners) for early-stage startups. Fast delivery, volume-friendly.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Figma, Illustrator</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3–4 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$200–$800 package</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1.5K–$3K</div></div>
+              </div>
+            </div>
+
+            <!-- 17 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Tutoring (Online, Niche)</h4>
+                <span class="service-num">17</span>
+              </div>
+              <p class="service-desc">Tutor high-school students in the subjects you just finished — SAT math, AP Chem, CS intro. Your recent experience is literally the product.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Zoom, iPad</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">None</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$35–$80/hr</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1K–$2.5K</div></div>
+              </div>
+            </div>
+
+            <!-- 18 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Prompt Engineering for SMBs</h4>
+                <span class="service-num">18</span>
+              </div>
+              <p class="service-desc">Build internal GPTs and Claude workflows for small businesses — custom assistants for customer support, content, ops. New, underpriced.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">ChatGPT, Claude</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$400–$2,000 project</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$4K</div></div>
+              </div>
+            </div>
+
+            <!-- 19 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Voiceover & AI Voice Services</h4>
+                <span class="service-num">19</span>
+              </div>
+              <p class="service-desc">Record your own voice for ads and explainers, or use ElevenLabs to produce AI voiceovers for YouTube channels and e-learning.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">ElevenLabs, mic</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">2 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$50–$300/script</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$1K–$2.5K</div></div>
+              </div>
+            </div>
+
+            <!-- 20 -->
+            <div class="service-card">
+              <div class="service-card-head">
+                <h4>Short-Form Video Editing</h4>
+                <span class="service-num">20</span>
+              </div>
+              <p class="service-desc">Full edits for creators — captions, b-roll, motion graphics, color correction. Heavier than clipping, higher paying, retainer-ready.</p>
+              <div class="service-meta">
+                <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value diff"><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot on"></span><span class="diff-dot"></span><span class="diff-dot"></span></div></div>
+                <div class="meta-item"><div class="meta-label">Tools</div><div class="meta-value">Premiere, CapCut</div></div>
+                <div class="meta-item"><div class="meta-label">Learn Time</div><div class="meta-value">3–4 weeks</div></div>
+                <div class="meta-item"><div class="meta-label">Price / Client</div><div class="meta-value price">$150–$800/video</div></div>
+                <div class="meta-item"><div class="meta-label">Month 3 Target</div><div class="meta-value">$2K–$5K</div></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="action-box">
+            <div class="action-tag">★ This Week's Action</div>
+            <ul>
+              <li>Pick <strong>your top 3 services</strong> based on gut reaction alone.</li>
+              <li>Take the quiz at the bottom of this course — compare the quiz's suggestion to your top 3.</li>
+              <li>Commit to <strong>one</strong> before you close this page.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- LESSON 1.3 -->
+        <article class="lesson" id="l1-3">
+          <div class="lesson-num">LESSON 1.3</div>
+          <h3>How to actually choose (without analysis paralysis)</h3>
+
+          <p>Most students spend 3 weeks picking a service and then never start. Don't be that student. Use these four filters, in order:</p>
+
+          <h4>Filter 1 — Can you imagine doing this for 10 hours straight?</h4>
+          <p>If the answer is "not really," cross it off. You will do this for 10-hour weekends when a client deadline hits. Pick something where the work itself isn't painful.</p>
+
+          <h4>Filter 2 — Does it match what you already half-know?</h4>
+          <p>If you've edited your own TikToks for three years, video clipping is not a new skill — it's a monetization of an existing one. Head start matters. Don't pick prompt engineering just because it pays more if you've never touched ChatGPT seriously.</p>
+
+          <h4>Filter 3 — Can you show the output on a screen?</h4>
+          <p>Visual services (design, video, websites) convert clients faster because prospects can see the work in 4 seconds. If you hate having your work judged, pick a backend service like lead gen or cold email infra — the proof is numbers, not aesthetics.</p>
+
+          <h4>Filter 4 — Does it fit your weekly hours?</h4>
+          <p>If you have 5 hours a week, pick something modular (thumbnails, clips, resumes). If you have 15+, pick something with depth (Notion builds, website editing, automation). Mismatched hours kill more student businesses than bad clients do.</p>
+
+          <div class="callout">
+            <div class="callout-tag">Decision rule</div>
+            <p>If two services tie, pick the one that's <strong>more visual</strong> — it's easier to market as a student. A before/after thumbnail speaks louder than a paragraph about your SEO process.</p>
+          </div>
+
+          <div class="action-box">
+            <div class="action-tag">★ This Week's Action</div>
+            <ul>
+              <li>Apply all 4 filters to your top 3.</li>
+              <li>Write down your final pick on paper. Stick it somewhere visible.</li>
+              <li>Move to Chapter 3 (Week 1 — Learning). <strong>Do not come back to re-pick.</strong></li>
+            </ul>
+          </div>
+
+          <div class="promo-mini">
+            <strong>Side note:</strong> Picking a service is a 30-day decision. Picking a career is a 30-year one. If part of why you're here is because you suspect your major isn't the right fit, <a href="https://getcareergps.com" target="_blank" rel="noopener">Career GPS</a> builds you a 12-month personalized roadmap to figure that out — also available on <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener">Gumroad</a>.
+          </div>
+        </article>
+
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 2 — QUIZ RESULTS -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch2">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 02 · Service Selection (Quiz Results)</div>
+          <h2>Your <em>personality</em> is a strategy.</h2>
+        </div>
+
+        <p style="margin-bottom: 28px; color: var(--ink-dim);">Once you take the 20-question quiz at the end of this course, you'll land in one of four dominant profiles. Here's what each profile should actually pick — and what to avoid.</p>
+
+        <!-- LESSON 2.1 -->
+        <article class="lesson" id="l2-1">
+          <div class="lesson-num">LESSON 2.1</div>
+          <h3>Technical profile — top 5 services</h3>
+
+          <p>If your quiz leans <strong>Technical</strong>, you're comfortable with logic, tools that break, and APIs. You probably enjoy solving puzzles. Pick something where precision pays more than personality.</p>
+
+          <ol>
+            <li><strong>AI Automation Setup.</strong> Highest ceiling in the book. Zapier and Make are learnable in 3 weeks. Every SMB needs this and most don't know it.</li>
+            <li><strong>Cold Email Infrastructure.</strong> Technical enough to protect you from competition, simple enough to learn by watching 15 YouTube videos. Retainer gold.</li>
+            <li><strong>Data Scraping.</strong> If you can write basic Python or operate Octoparse, you will not lack for clients. Stay ethical — stick to public data.</li>
+            <li><strong>Prompt Engineering for SMBs.</strong> The newest category on the list. Lower competition, higher education cost (you'll explain the value a lot).</li>
+            <li><strong>Website Editing.</strong> If you like structured visuals, Framer and Webflow reward technical minds more than art-school minds.</li>
+          </ol>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Avoid</div>
+            <p>Social media management, UGC creation, virtual assistant work. Technical minds tend to resent tasks that require constant client-facing creativity and emotional labor.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 2.2 -->
+        <article class="lesson" id="l2-2">
+          <div class="lesson-num">LESSON 2.2</div>
+          <h3>Creative profile — top 5 services</h3>
+
+          <p>If your quiz leans <strong>Creative</strong>, you notice when a thumbnail is bad before you can explain why. You have taste, and taste is sellable.</p>
+
+          <ol>
+            <li><strong>Thumbnail Design.</strong> The purest expression of creative micro-work. Creators judge you on one image — if you can win that test, you'll never go hungry.</li>
+            <li><strong>Short-Form Video Editing.</strong> Pacing, music, emotion. If you grew up on TikTok, you already have the training data.</li>
+            <li><strong>Logo & Brand Micro-Design.</strong> Small, repeatable, visually satisfying. Build 10 brand kits and you have a real portfolio.</li>
+            <li><strong>Website Editing (Framer).</strong> Framer rewards visual minds. Webflow rewards structural ones. Pick by instinct.</li>
+            <li><strong>UGC Creation.</strong> If you're comfortable on camera, this is the fastest creative cash in the book. Brands will take you seriously at 19.</li>
+          </ol>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Avoid</div>
+            <p>Lead generation, data scraping, cold email infrastructure. The output is invisible. You'll quit within two months from boredom.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 2.3 -->
+        <article class="lesson" id="l2-3">
+          <div class="lesson-num">LESSON 2.3</div>
+          <h3>Communicator profile — top 5 services</h3>
+
+          <p>If your quiz leans <strong>Communicator</strong>, you close people in DMs without meaning to. You have natural empathy and you write like you talk. Your edge is relational, not technical.</p>
+
+          <ol>
+            <li><strong>Newsletter Ghostwriting.</strong> You're literally selling a voice. Communicators dominate here because the work is 80% listening, 20% writing.</li>
+            <li><strong>Social Media Management.</strong> You understand how humans interact online. That's the entire job.</li>
+            <li><strong>SEO Blog Writing.</strong> AI drafts the article, you give it voice and structure. Perfect for communicators who also like systems.</li>
+            <li><strong>Virtual Assistant (niche).</strong> Great clients pick VAs they trust, not VAs who are cheapest. Communication is the moat.</li>
+            <li><strong>Resume & LinkedIn Optimization.</strong> You're translating someone's career story into something a stranger will hire. It's 100% a communication skill.</li>
+          </ol>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Avoid</div>
+            <p>Data scraping and cold email infrastructure. You'll be great at it but wildly underpaid for your real skill. Do the higher-leverage communication work.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 2.4 -->
+        <article class="lesson" id="l2-4">
+          <div class="lesson-num">LESSON 2.4</div>
+          <h3>Low-time students — top 5 services</h3>
+
+          <p>If you have <strong>fewer than 8 hours a week</strong>, you need modular services — work that fits in 1–3 hour blocks and doesn't require deep context each session.</p>
+
+          <ol>
+            <li><strong>Thumbnail Design.</strong> 30–90 minutes per thumbnail. You can deliver 4 in an evening.</li>
+            <li><strong>Short-Form Video Clipping.</strong> Highly repeatable. You can batch a full week of clips in one Sunday morning.</li>
+            <li><strong>Resume & LinkedIn Optimization.</strong> 2–3 hours per project. Zero ongoing maintenance.</li>
+            <li><strong>Tutoring.</strong> Hour-long blocks that pay immediately. Zero learning curve — you're selling subjects you already took.</li>
+            <li><strong>Newsletter Ghostwriting (biweekly).</strong> One issue every two weeks, 3–4 hours of work. Predictable retainer, limited client contact.</li>
+          </ol>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Avoid</div>
+            <p>Social media management, website builds, automation projects. These require context-switching and "always on" availability you don't have during midterms.</p>
+          </div>
+
+          <div class="action-box">
+            <div class="action-tag">★ This Week's Action</div>
+            <ul>
+              <li>Match your dominant quiz category to its top 5 list.</li>
+              <li>Cross-reference against your hours-per-week reality.</li>
+              <li>Lock in your pick. Move to Week 1.</li>
+            </ul>
+          </div>
+        </article>
+
+        <div class="promo">
+          <div class="promo-tag">★ Going Deeper</div>
+          <h4>Liked the quiz? There's one for your <em>whole career</em>.</h4>
+          <p>The 20-question quiz above maps you to a side-hustle. But if you've ever felt like your degree might be the wrong one, or you're not sure where the next 12 months should go, Career GPS goes a layer deeper. It builds you a personalized year-long roadmap based on your strengths, your interests, and where you actually want to end up.</p>
+          <div class="promo-links">
+            <a href="https://getcareergps.com" target="_blank" rel="noopener" class="promo-btn">Try Career GPS <span class="arrow">→</span></a>
+            <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" class="promo-btn secondary">View on Gumroad <span class="arrow">→</span></a>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 3 — WEEK 1: LEARNING -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch3">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 03 · Week 1 — Learn</div>
+          <h2>Seven days to become <em>client-ready</em>.</h2>
+        </div>
+
+        <!-- LESSON 3.1 -->
+        <article class="lesson" id="l3-1">
+          <div class="lesson-num">LESSON 3.1</div>
+          <h3>Free learning resources — by service</h3>
+
+          <p>These are the curated starting points. Every link here is a channel or brand that existed and was active in 2025–2026. If something has moved, search the brand name directly.</p>
+
+          <h4>Video Clipping</h4>
+          <ul>
+            <li><strong>YouTube:</strong> search "Opus Clip tutorial 2025" and "CapCut for short-form creators"</li>
+            <li><strong>Channels:</strong> Matti Haapoja, Peter McKinnon (intro editing), Eddie Bai (short-form strategy)</li>
+            <li><strong>Free course:</strong> CapCut's own learning hub + TikTok Creator Academy</li>
+          </ul>
+
+          <h4>Thumbnail Design</h4>
+          <ul>
+            <li><strong>YouTube:</strong> search "MrBeast thumbnail breakdown" and "Photoshop thumbnail tutorial beginner"</li>
+            <li><strong>Channels:</strong> Pierre TK, Design Pilot, ColdFusion's "how thumbnails work" essays</li>
+            <li><strong>Free tool:</strong> Photopea (browser-based Photoshop alternative, 100% free)</li>
+          </ul>
+
+          <h4>Notion Workspace Setup</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Thomas Frank, August Bradley (Pillars-Pipelines-Vaults), Easlo</li>
+            <li><strong>Free course:</strong> Notion's official "Notion Essentials" on their learn page</li>
+            <li><strong>Practice:</strong> rebuild 3 public Notion templates from scratch without looking</li>
+          </ul>
+
+          <h4>AI Automation</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Nick Saraev, The AI Automator, AI Foundations</li>
+            <li><strong>Free course:</strong> Zapier University (genuinely good, free, certified)</li>
+            <li><strong>Skill path:</strong> learn Zapier first → then Make → then n8n if you want self-hosted</li>
+          </ul>
+
+          <h4>Website Editing (Webflow / Framer)</h4>
+          <ul>
+            <li><strong>Framer Academy:</strong> their own free learning portal — best-in-class</li>
+            <li><strong>Webflow University:</strong> complete, certified, free. Do the "Webflow 101" crash course.</li>
+            <li><strong>YouTube:</strong> Flux Academy, Ran Segall, Timothy Ricks</li>
+          </ul>
+
+          <h4>Podcast Editing</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Music Radio Creative, Descript's own channel</li>
+            <li><strong>Free tool:</strong> Descript has a generous free tier — learn there before paying</li>
+            <li><strong>Reference:</strong> listen to 5 episodes of well-edited podcasts (Lex Fridman, Huberman) with a notebook</li>
+          </ul>
+
+          <h4>Social Media Management</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Vanessa Lau, Gary Vee's old cuts, Latasha James</li>
+            <li><strong>Free course:</strong> HubSpot Academy's Social Media Marketing course (officially certified)</li>
+            <li><strong>Free tool:</strong> Buffer's free tier covers 3 channels</li>
+          </ul>
+
+          <h4>Newsletter Ghostwriting</h4>
+          <ul>
+            <li><strong>Read daily:</strong> Morning Brew, The Hustle, Sahil Bloom, Justin Welsh — reverse-engineer them</li>
+            <li><strong>YouTube:</strong> Dan Koe's writing videos, Tim Stoddart</li>
+            <li><strong>Free tool:</strong> Beehiiv's free plan + Substack both fine to practice on</li>
+          </ul>
+
+          <h4>Lead Generation</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Leadbird, Ravi Abuvala (older content), Jordan Platten</li>
+            <li><strong>Free tool:</strong> Apollo's free plan gives you 50 email credits/day to practice</li>
+            <li><strong>Skill:</strong> master Boolean search on LinkedIn and Google first</li>
+          </ul>
+
+          <h4>Cold Email Infrastructure</h4>
+          <ul>
+            <li><strong>YouTube:</strong> Leadbird, Salesbread, Instantly's own channel</li>
+            <li><strong>Free knowledge:</strong> Smartlead and Instantly both have excellent free blogs covering domain warmup, SPF/DKIM/DMARC</li>
+            <li><strong>Start:</strong> understand deliverability before you touch copy</li>
+          </ul>
+
+          <div class="callout">
+            <div class="callout-tag">Rule of 1</div>
+            <p>Pick <strong>one</strong> channel or course and finish it before starting another. Consumption without completion is the #1 reason students stay stuck. A mediocre course you finished beats a great course you half-did.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 3.2 -->
+        <article class="lesson" id="l3-2">
+          <div class="lesson-num">LESSON 3.2</div>
+          <h3>Tool setup guide — what to install, how to get it free</h3>
+
+          <p>Don't pay for anything in Week 1. Every tool below has a free tier or a student discount that covers your needs through Month 2.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Service</th><th>Primary tool</th><th>Free tier or student deal</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Video clipping</strong></td><td>CapCut + Opus Clip</td><td>CapCut free forever. Opus Clip has a free plan (90 min/mo).</td></tr>
+                <tr><td><strong>Thumbnail design</strong></td><td>Photoshop or Photopea</td><td>Adobe CC student: $19.99/mo. Photopea: free, browser-based.</td></tr>
+                <tr><td><strong>Notion workspaces</strong></td><td>Notion</td><td>Free with .edu email — Notion Plus plan free for students.</td></tr>
+                <tr><td><strong>AI automation</strong></td><td>Zapier, Make</td><td>Zapier free: 100 tasks/mo. Make free: 1,000 ops/mo.</td></tr>
+                <tr><td><strong>Website editing</strong></td><td>Webflow, Framer</td><td>Webflow free staging sites. Framer free plan with Framer.website subdomain.</td></tr>
+                <tr><td><strong>Podcast editing</strong></td><td>Descript, Audacity</td><td>Descript free: 1 hr/mo transcription. Audacity 100% free.</td></tr>
+                <tr><td><strong>Social media</strong></td><td>Buffer, Canva</td><td>Buffer free: 3 channels. Canva Edu: free for students.</td></tr>
+                <tr><td><strong>Newsletters</strong></td><td>Beehiiv, Substack</td><td>Both free until 2,500 subscribers.</td></tr>
+                <tr><td><strong>Lead gen</strong></td><td>Apollo, LinkedIn</td><td>Apollo free: 50 email credits/day. Sales Navigator: 1-mo free trial.</td></tr>
+                <tr><td><strong>Cold email infra</strong></td><td>Instantly, Smartlead</td><td>Instantly trial: 14 days. Use it to learn, then buy domains later.</td></tr>
+                <tr><td><strong>Logo design</strong></td><td>Figma</td><td>Figma free: unlimited personal files. Education plan available.</td></tr>
+                <tr><td><strong>Short-form editing</strong></td><td>Premiere Pro, CapCut Pro</td><td>Adobe student discount. CapCut Pro: $9.99/mo (cheaper than CC).</td></tr>
+                <tr><td><strong>Voice services</strong></td><td>ElevenLabs</td><td>Free tier: 10k characters/mo. Enough for your first 2 projects.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Watch out</div>
+            <p>Do not pay for a Stripe account, a "business agency starter pack," or any paid Discord server until Month 2. None of those will get you your first client faster. A Gmail account and a Google Doc will.</p>
+          </div>
+
+          <h4>One-time setup (30 minutes, do this today)</h4>
+          <ul>
+            <li>Create a <strong>dedicated work email</strong>: firstname.lastname.works@gmail.com (keeps school and work separate).</li>
+            <li>Create a <strong>free Notion workspace</strong> with three pages: Learning, Clients, Invoices.</li>
+            <li>Sign up for <strong>Stripe or Wise</strong>. You can't take payment from a real client in a week without this.</li>
+            <li>Create a <strong>Twitter/X and LinkedIn account</strong> under your real name. Empty is fine for now.</li>
+          </ul>
+        </article>
+
+        <!-- LESSON 3.3 -->
+        <article class="lesson" id="l3-3">
+          <div class="lesson-num">LESSON 3.3</div>
+          <h3>Day 1 checklist — no excuses</h3>
+
+          <p>If you don't do every item on this list within 24 hours of picking your service, you will drift. Check each one off physically — pen on paper.</p>
+
+          <h4>Morning (60 minutes)</h4>
+          <ul>
+            <li>Pick your one service. Say it out loud.</li>
+            <li>Create your work email.</li>
+            <li>Open your Notion workspace with the 3 pages.</li>
+            <li>Open Stripe or Wise, start the signup (you can finish verification later).</li>
+          </ul>
+
+          <h4>Afternoon (90 minutes)</h4>
+          <ul>
+            <li>Watch <strong>two</strong> YouTube videos in your service's learning stack. Take notes by hand, not on screen.</li>
+            <li>Install the primary free tool for your service.</li>
+            <li>Click around in the tool for 30 minutes. Don't read the docs yet — just explore.</li>
+          </ul>
+
+          <h4>Evening (45 minutes)</h4>
+          <ul>
+            <li>Write down, in one paragraph, what your service is. "I help [who] do [what] so they can [outcome]."</li>
+            <li>Screenshot that paragraph. That's your first marketing document.</li>
+            <li>Set a recurring calendar block: 1 hour a day, same time, for the next 6 days. Non-negotiable.</li>
+          </ul>
+
+          <div class="action-box">
+            <div class="action-tag">★ Day 7 milestone</div>
+            <ul>
+              <li>You can explain your service in one sentence, to a friend, without reading.</li>
+              <li>You've completed at least 6 hours of focused learning.</li>
+              <li>You've opened the tool and built something small — even if it's garbage.</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 4 — WEEK 2: PRACTICE -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch4">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 04 · Week 2 — Practice</div>
+          <h2>Do the work <em>before</em> anyone pays you to.</h2>
+        </div>
+
+        <!-- LESSON 4.1 -->
+        <article class="lesson" id="l4-1">
+          <div class="lesson-num">LESSON 4.1</div>
+          <h3>Three practice projects — by service</h3>
+
+          <p>The rule this week: <strong>finish three projects, start-to-deliverable, for imaginary clients.</strong> You'll use these three as your portfolio next week. Each project should take 4–8 hours.</p>
+
+          <details>
+            <summary>Video Clipping</summary>
+            <ul>
+              <li>Find a long-form podcast on YouTube. Make 10 vertical clips with captions, hooks, and outro cards.</li>
+              <li>Pick a YouTube creator with &lt;50k subs. Make 5 TikTok-ready clips from their latest video.</li>
+              <li>Take one Lex Fridman or Huberman interview and make a "best moments" reel. 90 seconds.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Thumbnail Design</summary>
+            <ul>
+              <li>Pick 3 existing videos from real creators. Redesign their thumbnails. Show before/after.</li>
+              <li>Design 5 thumbnails for a fictional finance creator. Keep the style consistent — that proves you can run a retainer.</li>
+              <li>Reverse-engineer a MrBeast thumbnail layer-by-layer in Photoshop or Photopea.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Notion Workspace Setup</summary>
+            <ul>
+              <li>Build a content calendar + publishing pipeline for a fictional YouTuber.</li>
+              <li>Build a freelancer CRM: leads, active clients, invoices, follow-ups, all linked.</li>
+              <li>Build a student second-brain: classes, projects, readings, exam prep. Use your own data.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>AI Automation</summary>
+            <ul>
+              <li>Build a Zap: Typeform submission → adds row to Airtable → sends Slack notification → sends branded auto-reply email.</li>
+              <li>Build a Make scenario: new Gmail with specific label → extract data → append to Google Sheet → trigger Calendar event.</li>
+              <li>Build a content automation: Google Sheet row → ChatGPT caption → post draft to Buffer.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Website Editing</summary>
+            <ul>
+              <li>Rebuild a real SaaS landing page (e.g., Linear or Superhuman) in Framer. Pixel-close.</li>
+              <li>Build a 3-page portfolio site for a fictional photographer.</li>
+              <li>Take an ugly local business site and redesign the homepage. Send the live link to yourself like a real client would.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Podcast Editing</summary>
+            <ul>
+              <li>Record 10 minutes of conversation with a friend. Clean it fully — ums, breaths, transitions, intro music.</li>
+              <li>Take a raw podcast file from a free archive, edit it to broadcast quality, write show notes.</li>
+              <li>Build a template project file in Descript or Audacity for future client work.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Social Media Management</summary>
+            <ul>
+              <li>Pick a small local business. Write a 2-week content calendar (14 posts) for their Instagram. Include visuals.</li>
+              <li>Rewrite the bios and pinned posts for 3 underperforming LinkedIn pages.</li>
+              <li>Build a content audit deck: what the brand should stop, start, and continue. 5 slides.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Newsletter Writing</summary>
+            <ul>
+              <li>Pick a niche (say, indie game development). Write 3 full newsletter issues as if you're the founder.</li>
+              <li>Take an existing creator's bad newsletter and rewrite one issue. Show before/after.</li>
+              <li>Write a "welcome email sequence" — 5 emails, each 300–500 words.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Lead Generation</summary>
+            <ul>
+              <li>Build a list of 100 verified emails in a specific B2B niche (e.g., Series A SaaS founders in NYC).</li>
+              <li>Build the same list again using a different sourcing method. Compare quality.</li>
+              <li>Write a Loom walking through your process — this becomes your sales asset.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Cold Email Infrastructure</summary>
+            <ul>
+              <li>Buy one domain ($10), set up SPF/DKIM/DMARC records, warm it for 14 days.</li>
+              <li>Build a full 500-lead cold email campaign (to yourself on 5 burner inboxes). Verify open/reply/bounce metrics.</li>
+              <li>Document the full setup as a 10-step PDF. This is your service deliverable template.</li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- LESSON 4.2 -->
+        <article class="lesson" id="l4-2">
+          <div class="lesson-num">LESSON 4.2</div>
+          <h3>Quality control — how to judge your own work</h3>
+
+          <p>Beginners can't tell when their work is bad. That's not an insult — it's a fact of pattern recognition. Here's how to force objective feedback on yourself without a mentor.</p>
+
+          <h4>The "overnight" test</h4>
+          <p>Finish your practice project. Close it. Sleep. Open it the next morning and look at it as if a stranger sent it to you. Most of what you liked yesterday will feel slightly off. That's your gap.</p>
+
+          <h4>The "first 3 seconds" test (for visual work)</h4>
+          <p>Show your thumbnail, video clip, or website to a non-designer friend. Show it for 3 seconds, then hide it. Ask: "What's it about? Would you click?" Their gut answer is the only data that matters. If they hesitate, it failed.</p>
+
+          <h4>The "side-by-side" test</h4>
+          <p>Open three top-tier examples from real pros in your niche. Put your work next to them. Don't ask "is mine good?" — ask "where specifically is mine worse?" List 5 differences, fix the biggest one, repeat.</p>
+
+          <h4>The "can you explain it" test (for backend work)</h4>
+          <p>For automation, lead gen, scraping — can you explain what you built to your grandmother in 2 minutes? If not, you don't understand it well enough to sell it.</p>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Hard truth</div>
+            <p>Your first three projects will not be client-ready. That's fine. Your fourth will be borderline. Your sixth will be sellable. Volume is the fix, not more YouTube videos.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 4.3 -->
+        <article class="lesson" id="l4-3">
+          <div class="lesson-num">LESSON 4.3</div>
+          <h3>Real examples — before/after, what "good" looks like</h3>
+
+          <p>Studying real examples compresses months of taste-building into days. Here's where to find high-quality reference work, by service.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Service</th><th>Where to study great work</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Video clipping</strong></td><td>TikTok accounts of Alex Hormozi, Steven Bartlett, Chris Williamson — their clipper teams set the standard.</td></tr>
+                <tr><td><strong>Thumbnails</strong></td><td>MrBeast, Ali Abdaal, Colin and Samir. Also browse ThumbnailChecker.com and 1of10.com.</td></tr>
+                <tr><td><strong>Notion builds</strong></td><td>Notion's template gallery. Easlo's public templates. August Bradley's YouTube walkthroughs.</td></tr>
+                <tr><td><strong>AI automation</strong></td><td>Zapier's public templates directory. Make's "Templates" tab. Nick Saraev's case-study videos.</td></tr>
+                <tr><td><strong>Websites</strong></td><td>Framer.website's "Made in Framer" showcase. Webflow's "Made in Webflow" showcase. Godly.website for taste.</td></tr>
+                <tr><td><strong>Podcast editing</strong></td><td>Every episode of My First Million, All-In, and Lex Fridman. Listen for transitions and cuts.</td></tr>
+                <tr><td><strong>Social media</strong></td><td>Duolingo, Ryanair, Scrub Daddy. Note how much personality beats polish.</td></tr>
+                <tr><td><strong>Newsletters</strong></td><td>Morning Brew, The Hustle, Justin Welsh's Saturday Solopreneur, Sahil Bloom's Curiosity Chronicle.</td></tr>
+                <tr><td><strong>Lead gen</strong></td><td>Clay.com's public case studies. LeadGen.io's blog. Apollo's "customer examples" section.</td></tr>
+                <tr><td><strong>Logos & brand</strong></td><td>Dribbble "top of the day" and Brand New. Copy structure and layout — not designs.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="action-box">
+            <div class="action-tag">★ Day 14 milestone</div>
+            <ul>
+              <li>You have <strong>3 finished pieces of work</strong>, stored and labeled.</li>
+              <li>You've studied at least 20 real-world examples of top-tier work in your service.</li>
+              <li>You can identify 3 specific weaknesses in your own projects and know how to fix them.</li>
+            </ul>
+          </div>
+        </article>
+
+        <div class="promo-mini">
+          <strong>While you're practicing:</strong> the skills you build over the next two weeks may end up being your real career, not your major. If you're already sensing that, <a href="https://getcareergps.com" target="_blank" rel="noopener">Career GPS</a> helps you map out the next 12 months around what you're actually good at — also on <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener">Gumroad</a>.
+        </div>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 5 — WEEK 3: PORTFOLIO -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch5">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 05 · Week 3 — Portfolio</div>
+          <h2>One link. One job: <em>close the client</em>.</h2>
+        </div>
+
+        <!-- LESSON 5.1 -->
+        <article class="lesson" id="l5-1">
+          <div class="lesson-num">LESSON 5.1</div>
+          <h3>Why a portfolio matters (and what it actually does)</h3>
+
+          <p>A portfolio isn't a résumé. Its job isn't to explain who you are. Its job is to <strong>lower the risk</strong> the client feels when they consider hiring you.</p>
+
+          <p>Every prospect runs the same silent checklist: "Is this person real? Have they done this before? Do they understand my world? Can they deliver before my next launch?" A good portfolio answers all four in under 60 seconds.</p>
+
+          <h4>What a student portfolio must do</h4>
+          <ul>
+            <li><strong>Show the work first.</strong> Three pieces, at most. Above the fold. No greeting paragraph.</li>
+            <li><strong>Explain the context.</strong> For each piece: who it was for (real or imagined), what the brief was, what you delivered.</li>
+            <li><strong>Prove you can deliver again.</strong> Show your process — a short description of how you worked, or a Loom walkthrough.</li>
+            <li><strong>Make contact one click.</strong> One button. Calendly or an email. No forms with 8 fields.</li>
+          </ul>
+
+          <h4>What a student portfolio must NOT do</h4>
+          <ul>
+            <li>Open with "I'm a passionate Computer Science student at…" — instant close-tab energy.</li>
+            <li>Hide your work behind logins, PDFs, or Behance pages that require a click to expand.</li>
+            <li>Include unrelated school projects. Three relevant pieces beat ten random ones.</li>
+            <li>Say "Available for hire" without saying <em>for what</em>. Specificity closes.</li>
+          </ul>
+
+          <div class="callout">
+            <div class="callout-tag">The 10-second test</div>
+            <p>Give your portfolio link to a friend. Ask them: "What do I do, and would you hire me?" after 10 seconds. If they can't answer both, rebuild.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 5.2 -->
+        <article class="lesson" id="l5-2">
+          <div class="lesson-num">LESSON 5.2</div>
+          <h3>Portfolio templates — by service</h3>
+
+          <p>Copy these structures. You're not trying to be original with the layout — you're trying to reduce friction.</p>
+
+          <h4>Video clipping / short-form editing</h4>
+          <ul>
+            <li><strong>Hero:</strong> Your 3 best clips auto-playing, muted, in a 9:16 grid.</li>
+            <li><strong>About:</strong> One sentence. "I turn podcast episodes into 10+ viral-ready clips per week for creators with 50k+ subscribers."</li>
+            <li><strong>Proof:</strong> If any clip got traction, screenshot the view count. If not, just let the work speak.</li>
+            <li><strong>CTA:</strong> "Book a free 15-min clip strategy call."</li>
+          </ul>
+
+          <h4>Thumbnail design</h4>
+          <ul>
+            <li><strong>Hero:</strong> 6-thumbnail grid. No text. Just the work.</li>
+            <li><strong>Case studies:</strong> Pick 2 of your 6 and show the process — sketch, rough, final.</li>
+            <li><strong>Offer:</strong> "$60 per thumbnail. $400/mo for 10 thumbnails. 48-hour delivery."</li>
+            <li><strong>CTA:</strong> "Message me on X or book a call."</li>
+          </ul>
+
+          <h4>Notion workspace setup</h4>
+          <ul>
+            <li><strong>Hero:</strong> A short Loom video (under 3 min) walking through one completed workspace.</li>
+            <li><strong>Three template previews:</strong> screenshots only, not live access.</li>
+            <li><strong>Packages:</strong> Starter / Standard / Premium with clear deliverables.</li>
+            <li><strong>CTA:</strong> "Book a Notion strategy call."</li>
+          </ul>
+
+          <h4>AI automation / prompt engineering</h4>
+          <ul>
+            <li><strong>Hero:</strong> A list of 3 automations you've built, each with a one-line outcome — "Saves [client type] 8 hours/week."</li>
+            <li><strong>Case studies:</strong> A short Loom for each, showing the flow and explaining the logic.</li>
+            <li><strong>Tech stack:</strong> The tools you work with (builds credibility fast).</li>
+            <li><strong>CTA:</strong> "Book a 20-min automation audit."</li>
+          </ul>
+
+          <h4>Website editing</h4>
+          <ul>
+            <li><strong>Hero:</strong> Your own portfolio site is the first proof. Make it gorgeous.</li>
+            <li><strong>Project cards:</strong> 3 sites, each with desktop+mobile mockups and a "view live" link.</li>
+            <li><strong>Services:</strong> "Landing page build ($800). Full site ($1,800). Ongoing edits ($400/mo)."</li>
+            <li><strong>CTA:</strong> "Get a fixed quote in 24 hours."</li>
+          </ul>
+
+          <h4>Newsletter ghostwriting</h4>
+          <ul>
+            <li><strong>Hero:</strong> Three full issue samples embedded on the page (not linked out).</li>
+            <li><strong>Positioning:</strong> One sentence about who you write for — "I write weekly newsletters for solo founders in B2B SaaS."</li>
+            <li><strong>Process:</strong> 3-step explanation — research call, draft, revision.</li>
+            <li><strong>CTA:</strong> "Email me to discuss your newsletter."</li>
+          </ul>
+
+          <h4>Social media management</h4>
+          <ul>
+            <li><strong>Hero:</strong> Before/after stats on a real or practice account. Growth charts even if modest.</li>
+            <li><strong>Deliverables:</strong> Specific — posts per week, platforms, reporting cadence.</li>
+            <li><strong>Niche:</strong> Loud and clear. "SMM for wellness coaches with 5k–50k followers."</li>
+            <li><strong>CTA:</strong> "Book a discovery call."</li>
+          </ul>
+        </article>
+
+        <!-- LESSON 5.3 -->
+        <article class="lesson" id="l5-3">
+          <div class="lesson-num">LESSON 5.3</div>
+          <h3>Free portfolio platforms — and which to pick</h3>
+
+          <p>You do not need a custom domain or a Webflow build in Week 3. Pick one free platform and ship today.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Platform</th><th>Best for</th><th>Setup time</th><th>Cost</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Notion</strong></td><td>Anyone. Especially Notion, automation, writing, VA services.</td><td>30 min</td><td>Free</td></tr>
+                <tr><td><strong>Framer</strong></td><td>Designers, website editors, UGC creators who want visual polish.</td><td>2 hrs</td><td>Free (subdomain)</td></tr>
+                <tr><td><strong>Behance</strong></td><td>Thumbnail designers, logo designers. Good for discovery.</td><td>1 hr</td><td>Free</td></tr>
+                <tr><td><strong>Read.cv</strong></td><td>Writers, ghostwriters, personal-brand-first services.</td><td>20 min</td><td>Free</td></tr>
+                <tr><td><strong>Contra</strong></td><td>Any freelancer. Doubles as a marketplace.</td><td>30 min</td><td>Free, 0% fees</td></tr>
+                <tr><td><strong>Dribbble</strong></td><td>Pure visual portfolio; less about inbound, more about taste proof.</td><td>30 min</td><td>Free tier</td></tr>
+                <tr><td><strong>Carrd</strong></td><td>One-page simple portfolios. Great if you have zero design taste yet.</td><td>1 hr</td><td>Free (under 3 sites)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Our default recommendation for Week 3</h4>
+          <p>If you're unsure, use <strong>Notion</strong>. Here's why: you can make it public with one click, it costs nothing, you can embed videos and Looms, and you can iterate in 30 seconds without redeploying anything. You can upgrade to Framer or a custom site later once you have revenue.</p>
+
+          <div class="action-box">
+            <div class="action-tag">★ Day 21 milestone</div>
+            <ul>
+              <li>Your portfolio URL is live and public.</li>
+              <li>Three pieces of work are embedded or linked.</li>
+              <li>One clear CTA is visible above the fold.</li>
+              <li>You've sent it to one friend for the 10-second test.</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 6 — WEEK 4: CLIENTS -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch6">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 06 · Week 4 — Finding Clients</div>
+          <h2>The first 10 are the <em>hardest</em> — and the cheapest.</h2>
+        </div>
+
+        <!-- LESSON 6.1 -->
+        <article class="lesson" id="l6-1">
+          <div class="lesson-num">LESSON 6.1</div>
+          <h3>The first-10-clients playbook</h3>
+
+          <p>Here's the math nobody tells students: at beginner skill level and beginner messaging, your conversion rate on cold outreach is <strong>roughly 1–3%</strong>. To close 10 clients, you need to hit around 400–800 real prospects. That's not depressing — it's liberating, because now you know what the job is.</p>
+
+          <h4>The platforms, ranked by ROI for students</h4>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Platform</th><th>Why it works for students</th><th>Watch out for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Twitter/X</strong></td><td>Creator economy lives here. Founders, coaches, and indie hackers pay fast and DM back.</td><td>Requires active posting for inbound. DMs work from day 1.</td></tr>
+                <tr><td><strong>LinkedIn</strong></td><td>B2B services (lead gen, cold email, automation, VA) — highest pay per client here.</td><td>Cold connection requests get limited. Use Sales Navigator trial.</td></tr>
+                <tr><td><strong>Upwork</strong></td><td>Fastest path to first revenue. Clients already intend to buy.</td><td>Race to the bottom on pricing. Use it for reps, then graduate.</td></tr>
+                <tr><td><strong>Fiverr</strong></td><td>Works for productized services (thumbnails, logos, clips, resumes).</td><td>Low trust, low pay. Treat it as a volume play.</td></tr>
+                <tr><td><strong>Contra</strong></td><td>0% fee freelance platform. US/EU clients. Quality inbound.</td><td>Less volume than Upwork. Set it up and forget it.</td></tr>
+                <tr><td><strong>Reddit</strong></td><td>Niche subs like r/slavelabour (new-freelancer work), r/forhire, service-specific subs.</td><td>Strict self-promo rules. Read every sub's rules first.</td></tr>
+                <tr><td><strong>Discord communities</strong></td><td>Indie founder servers, creator servers, Whop communities — warm audiences.</td><td>Lurk for a week before posting. Community-first.</td></tr>
+                <tr><td><strong>Cold email</strong></td><td>Highest leverage if your offer is strong. 500 emails/week feasible.</td><td>Requires infrastructure. Don't send from your personal Gmail.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>The 4-week client sprint</h4>
+          <ol>
+            <li><strong>Day 22–23:</strong> Pick 2 platforms (one fast — Upwork — and one long-term — X or LinkedIn). Set up your profile on both.</li>
+            <li><strong>Day 24–25:</strong> Build a prospect list of 100 real people or businesses in your niche.</li>
+            <li><strong>Day 26–28:</strong> Send 25 personalized messages a day. Track every one in a sheet.</li>
+            <li><strong>Day 29–30:</strong> Follow up with everyone who didn't reply. Pitch calls to anyone who did.</li>
+          </ol>
+
+          <h4>Realistic conversion math</h4>
+          <ul>
+            <li><strong>Cold DMs on X:</strong> 2–5% reply rate, ~20% of replies lead to a call, ~30% of calls close.</li>
+            <li><strong>LinkedIn cold connection:</strong> 30–40% accept, 5–10% of those respond to follow-up, ~30% close.</li>
+            <li><strong>Cold email (infra + personalization):</strong> 2–8% reply rate, ~25% of replies convert.</li>
+            <li><strong>Upwork:</strong> 5–15% proposal-to-interview rate, ~30% interview-to-hire.</li>
+          </ul>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Volume beats talent</div>
+            <p>Send <strong>100 messages per week minimum</strong>. Not 30. Not 50. A hundred. At beginner skill, volume is the ONLY thing that compensates for weak positioning. This will feel awful for 3 weeks, then suddenly easy.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 6.2 -->
+        <article class="lesson" id="l6-2">
+          <div class="lesson-num">LESSON 6.2</div>
+          <h3>Cold DM scripts — 5 templates that actually get replies</h3>
+
+          <p>Every script below is under 100 words. Nobody reads long DMs. Personalize the first sentence for every single send — that's the non-negotiable.</p>
+
+          <div class="script">
+<span class="script-label">DM 1 — Twitter/X · Specific praise + soft offer</span>
+<span class="script-body">
+Hey [Name] — just watched your thread on [specific topic]. The [specific point] hit hard because I'd been stuck on that myself.
+
+Quick question: are you clipping the long-form content yourself, or do you have someone doing it? I've been editing short-form for a few creators and noticed your recent videos would convert really well in vertical. Happy to send you 3 free sample clips to show what I mean — no strings.
+</span>
+<div class="script-note">Why this works: opens with a real observation (not flattery), names a specific artifact, asks a real question, offers value-first with zero pressure.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 2 — Instagram · Creator outreach for thumbnails</span>
+<span class="script-body">
+Hi [Name] — huge fan of your content on [niche]. I noticed your YouTube thumbnails have a ton of room to grow, especially against [competitor channel].
+
+I design thumbnails for creators in your space and just want to send you 2 free redesigns of your last videos. If you like them, we can talk about working together. If not, you keep them.
+
+Where's the best place to send the files?
+</span>
+<div class="script-note">Why this works: gives a competitive benchmark, offers concrete proof-of-work, keeps the close to one friction-free question.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 3 — LinkedIn · B2B service (lead gen / automation)</span>
+<span class="script-body">
+Hi [Name], saw your post about [hiring / scaling / their recent challenge]. Congrats on the growth.
+
+Quick one: I build automated lead-gen systems that pull 50–200 qualified prospects a week into your CRM, with verified emails. Takes about a week to set up.
+
+Worth a 15-minute call to see if it'd help, or should I send a 3-minute Loom instead?
+</span>
+<div class="script-note">Why this works: references a real signal, states exact outcome with numbers, gives two low-commitment choices.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 4 — Reddit / Discord · Community value-first approach</span>
+<span class="script-body">
+Hey — saw your comment in the thread about [problem]. I actually deal with this a lot for [type of client], so I wrote up a quick breakdown of how I'd solve it.
+
+No pitch. Just thought it might save you some time. Let me know if you want the rough notes.
+</span>
+<div class="script-note">Why this works: zero pitch, zero CTA, pure value. People who reply have self-qualified as warm leads.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 5 — X · Student honesty angle</span>
+<span class="script-body">
+Hey [Name] — straight up, I'm a [college] student building my portfolio as a [service]. Your [specific piece of content] is exactly the kind of work I want in it.
+
+I'll edit your next [video / post / site] for free this week. If it's good, tell one friend. If it's not, no hard feelings.
+
+Interested?
+</span>
+<div class="script-note">Why this works: radical honesty, clear trade (work for exposure), defined end state. A shockingly high percentage of creators say yes.</div>
+          </div>
+        </article>
+
+        <!-- LESSON 6.3 -->
+        <article class="lesson" id="l6-3">
+          <div class="lesson-num">LESSON 6.3</div>
+          <h3>Cold email templates — 5 templates with subject lines</h3>
+
+          <p>Subject line gets the open, first line gets the read, the offer gets the reply. All three matter. Keep emails under 90 words.</p>
+
+          <div class="script">
+<span class="script-label">EMAIL 1 — Short & direct</span>
+<span class="script-body">
+Subject: quick question about [their company]
+
+Hi [Name],
+
+Been reading [their company]'s [blog / newsletter / content]. The recent piece on [topic] stood out.
+
+I help [type of client] with [specific service outcome] — usually saves them 5–10 hours a week.
+
+Worth a 15-min call this week? If no, I'll stop reaching out after this one.
+
+[Name]
+</span>
+<div class="script-note">Subject line is lowercase on purpose — reads like a personal email, not marketing.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 2 — Proof-of-work attached</span>
+<span class="script-body">
+Subject: made you something
+
+Hi [Name],
+
+I rewrote your landing page hero section (attached, 2 variants). Took me 20 minutes — thought it was faster than trying to describe what I do.
+
+If either lands, feel free to use it. If you want the rest of the page reworked in the same style, I charge $400 flat, 48-hour turnaround.
+
+Either way, enjoy.
+
+[Name]
+</span>
+<div class="script-note">This works because you've eliminated the #1 objection: "can they actually do this?"</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 3 — Loom walkthrough</span>
+<span class="script-body">
+Subject: 3-minute video for [their company]
+
+Hi [Name],
+
+Made you a short Loom (3 min) breaking down 2 automations I'd set up for your team based on what I saw on your site — one to cut manual onboarding time, one to auto-route leads.
+
+[Loom link]
+
+If it's useful, I'd build both for $900 flat. If not, no worries.
+
+[Name]
+</span>
+<div class="script-note">Loom open rates are 3–4x higher than plain text. Video is leverage.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 4 — Warm introduction frame</span>
+<span class="script-body">
+Subject: [Mutual person] → you
+
+Hi [Name],
+
+[Mutual person / shared community] pointed me toward your work. Came by to say I'm a fan of [specific piece].
+
+Quick intro — I help [niche] with [service]. If you're ever looking for someone to take [pain point] off your plate, happy to chat. Otherwise, just wanted to say hi.
+
+[Name]
+</span>
+<div class="script-note">Works even if the "mutual" is just a shared Discord or newsletter you both follow.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 5 — The "I see a specific problem" email</span>
+<span class="script-body">
+Subject: one thing about your [site / newsletter / channel]
+
+Hi [Name],
+
+Noticed your [signup form / thumbnail / CTA] is costing you conversions — specifically, [specific observation].
+
+I fix this kind of thing for [niche] — usually a 2-day project, $500 flat.
+
+If you want, I can send a loom with exactly what I'd change, no commitment.
+
+[Name]
+</span>
+<div class="script-note">Direct, specific, fixable. Founders respect a clear read on their own product.</div>
+          </div>
+        </article>
+
+        <!-- LESSON 6.4 -->
+        <article class="lesson" id="l6-4">
+          <div class="lesson-num">LESSON 6.4</div>
+          <h3>LinkedIn outreach playbook</h3>
+
+          <p>LinkedIn rewards patience. The people who treat it like a spam channel burn out in 2 weeks. The people who treat it like a slow-relationship platform win in 3 months.</p>
+
+          <h4>Step 1 — Make your profile hire-worthy (before you send anything)</h4>
+          <ul>
+            <li><strong>Headline:</strong> not "Computer Science Student" — instead, "I build AI automations for agency owners · Zapier + Make certified"</li>
+            <li><strong>Banner:</strong> one sentence stating your offer and who it's for.</li>
+            <li><strong>About:</strong> 3 short paragraphs — who you help, what you deliver, how to work with you.</li>
+            <li><strong>Featured section:</strong> link to portfolio + one Loom walkthrough.</li>
+          </ul>
+
+          <h4>Step 2 — The 3-touch sequence</h4>
+
+          <div class="script">
+<span class="script-label">TOUCH 1 — Connection request note (300 characters)</span>
+<span class="script-body">
+Hi [Name] — saw your recent post on [topic]. Completely agreed on [specific point]. Would love to connect and follow what you're building at [company].
+</span>
+<div class="script-note">Goal of Touch 1: accept. Nothing else. Do not pitch.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">TOUCH 2 — Value message (3 days after they accept)</span>
+<span class="script-body">
+Hey [Name], thanks for connecting.
+
+Been following your work for a while and noticed [specific observation]. I put together a quick resource / loom / idea on how I'd tackle this — [link / attachment].
+
+No pitch, just thought it'd be useful.
+</span>
+<div class="script-note">Goal of Touch 2: demonstrate competence. Plant the seed.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">TOUCH 3 — Soft pitch (7–10 days later)</span>
+<span class="script-body">
+Hey [Name] — did you get a chance to look at what I sent?
+
+If any of it resonated, this is actually the kind of work I do for [type of client]. Happy to walk you through how I'd apply it specifically to [their company] in a 15-min call. Otherwise no worries, I'll keep cheering from the sidelines.
+</span>
+<div class="script-note">Goal of Touch 3: ask for the meeting. If no after Touch 3, drop to quarterly check-ins.</div>
+          </div>
+
+          <div class="callout">
+            <div class="callout-tag">Outreach cadence</div>
+            <p>Send 15–25 connection requests per day (LinkedIn caps at around 100/week for free accounts). Spread across 5 working days. Do Touch 2 and Touch 3 messages in daily 30-minute batches, not in bulk.</p>
+          </div>
+
+          <h4>What to post on LinkedIn while you're doing outreach</h4>
+          <p>Three posts per week, under 200 words each. Topics: a lesson learned from a project, a breakdown of a tool you use, a short opinion on your industry. People check your profile before replying to your DM — your posts are the trust-builder.</p>
+        </article>
+
+        <!-- LESSON 6.5 -->
+        <article class="lesson" id="l6-5">
+          <div class="lesson-num">LESSON 6.5</div>
+          <h3>Follow-up system — where 80% of deals actually close</h3>
+
+          <p>The data is uncomfortable: roughly <strong>80% of sales close after the 5th touch</strong>, but <strong>most freelancers stop after 1–2</strong>. That gap is your edge. You don't need to be better — you just need to follow up.</p>
+
+          <h4>The 4-message follow-up sequence (after no reply to your initial message)</h4>
+
+          <div class="script">
+<span class="script-label">FOLLOW-UP 1 · Day 3 · Bump</span>
+<span class="script-body">
+Hey [Name] — quick bump on the message above. Totally fine if it's not a fit, just wanted to make sure it didn't get buried.
+</span>
+<div class="script-note">Short, human, zero-pressure. 20%+ of replies come from this one message.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">FOLLOW-UP 2 · Day 7 · Extra value</span>
+<span class="script-body">
+Hey [Name] — while I was waiting I actually went ahead and [made a sample / wrote a Loom / sketched an idea] for you. [Link].
+
+No reply needed. Just thought it might be useful.
+</span>
+<div class="script-note">This is the conversion move. You've now given value twice with nothing back.</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">FOLLOW-UP 3 · Day 14 · The soft close</span>
+<span class="script-body">
+Hey [Name] — I know timing is everything with this kind of thing. Are you the right person, or is someone else on your team handling this now? Happy to loop them in or back off entirely.
+</span>
+<div class="script-note">Either gets you the real decision-maker or a clean "not now."</div>
+          </div>
+
+          <div class="script">
+<span class="script-label">FOLLOW-UP 4 · Day 30 · The goodbye</span>
+<span class="script-body">
+Hi [Name] — I'm going to stop reaching out so I'm not cluttering your inbox. If it ever becomes relevant, you've got my email. Wishing you a great [month / quarter].
+</span>
+<div class="script-note">The "goodbye email" has the weirdly high reply rate — roughly 15–20%. People respond to finality.</div>
+          </div>
+
+          <div class="action-box">
+            <div class="action-tag">★ Day 30 milestone</div>
+            <ul>
+              <li>100+ personalized outreach messages sent.</li>
+              <li>At least 3 conversations active or 1 client closed.</li>
+              <li>Full pipeline tracked in your weekly dashboard.</li>
+            </ul>
+          </div>
+        </article>
+
+        <div class="promo">
+          <div class="promo-tag">★ Zoom Out</div>
+          <h4>Landed a client? Now ask the <em>bigger</em> question.</h4>
+          <p>Once you've proven you can earn online, the next thing most students wrestle with is: "Does my degree even matter anymore?" Career GPS is built for exactly that moment — when you're realizing your major might not be the right path. It gives you a personalized 12-month roadmap to figure out what is.</p>
+          <div class="promo-links">
+            <a href="https://getcareergps.com" target="_blank" rel="noopener" class="promo-btn">Open Career GPS <span class="arrow">→</span></a>
+            <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" class="promo-btn secondary">Buy on Gumroad <span class="arrow">→</span></a>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 7 — PRICING -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch7">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 07 · Pricing</div>
+          <h2>Cheap is <em>not</em> the strategy.</h2>
+        </div>
+
+        <!-- LESSON 7.1 -->
+        <article class="lesson" id="l7-1">
+          <div class="lesson-num">LESSON 7.1</div>
+          <h3>Starter pricing — what to charge your first 3 clients</h3>
+
+          <p>The single most common student mistake: charging too little to "get experience." You don't get more experience at $30 than you do at $300 — you just get more annoying clients.</p>
+
+          <h4>The three-tier first-client strategy</h4>
+          <ul>
+            <li><strong>Client #1: Pay what you want.</strong> Truly. Deliver great work, ask for a video testimonial instead of cash if needed. Goal: first case study.</li>
+            <li><strong>Clients #2–3: Half your target rate.</strong> If the market rate for your service is $500, charge $250. Still a real price that filters out time-wasters.</li>
+            <li><strong>Clients #4+: Full market rate.</strong> You have testimonials now. Charge accordingly.</li>
+          </ul>
+
+          <h4>Realistic 2026 US beginner-rate benchmarks</h4>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Service</th><th>Beginner rate</th><th>Experienced rate</th><th>Premium rate</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Video clipping (retainer)</td><td>$300–$500/mo</td><td>$800–$1,500/mo</td><td>$2,000+/mo</td></tr>
+                <tr><td>Thumbnail design</td><td>$30–$60 each</td><td>$80–$150 each</td><td>$200+ each</td></tr>
+                <tr><td>Notion workspace build</td><td>$200–$400</td><td>$600–$1,200</td><td>$2,000+</td></tr>
+                <tr><td>AI automation setup</td><td>$300–$600/project</td><td>$1,000–$2,500</td><td>$3,000+</td></tr>
+                <tr><td>Website build (landing page)</td><td>$400–$800</td><td>$1,200–$2,500</td><td>$3,500+</td></tr>
+                <tr><td>Podcast edit per episode</td><td>$60–$100</td><td>$150–$250</td><td>$300+</td></tr>
+                <tr><td>Social media retainer</td><td>$400–$700/mo</td><td>$1,000–$1,800/mo</td><td>$2,500+/mo</td></tr>
+                <tr><td>Newsletter ghostwriting</td><td>$150–$250/issue</td><td>$400–$600/issue</td><td>$800+/issue</td></tr>
+                <tr><td>Lead gen (100 leads)</td><td>$75–$150</td><td>$200–$400</td><td>$500+</td></tr>
+                <tr><td>Logo + brand basics</td><td>$150–$300</td><td>$500–$800</td><td>$1,200+</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>EU / UK note</h4>
+          <p>European and UK clients often pay 10–20% less than US clients for the same service, but they also churn less and scope creep less. If you live in Europe, bill in USD when you can — Stripe makes it easy.</p>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Mental trap</div>
+            <p>"I'll charge low to win the deal." What actually happens: the cheap client demands the most, respects you the least, pays the slowest, and leaves the worst review. Your cheapest clients will consistently be your worst. Price low for <em>one</em> portfolio piece. Never as a strategy.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 7.2 -->
+        <article class="lesson" id="l7-2">
+          <div class="lesson-num">LESSON 7.2</div>
+          <h3>Value-based pricing — how to charge what the work is worth</h3>
+
+          <p>Hourly pricing caps your income at 168 hours a week. Value-based pricing caps it at whatever your service is actually worth to the client. Once you understand this, you never go back.</p>
+
+          <h4>The simple value equation</h4>
+          <p>Your price should be <strong>roughly 10–20% of the value you create</strong> for the client. Two examples:</p>
+
+          <ul>
+            <li>A newsletter that drives $5,000/mo in product sales = your ghostwriting is worth $500–$1,000/mo, not "4 hours at $30."</li>
+            <li>An automation that saves a team 10 hours/week (at $50/hr internal cost = $2,000/mo in saved time) = your setup is worth $2,000–$4,000, not "a one-day Zapier build."</li>
+          </ul>
+
+          <h4>How to actually get to a value-based price</h4>
+          <ol>
+            <li><strong>On the discovery call, ask:</strong> "If this project works, what's it worth to your business over 12 months?"</li>
+            <li><strong>Listen carefully.</strong> They'll usually tell you a range — $10k, $40k, $200k.</li>
+            <li><strong>Price at 10–20% of that number.</strong> If they say $40k, charge $4k–$8k.</li>
+            <li><strong>Frame the price against outcome:</strong> "If this is worth $40k to you and you invest $5k, that's an 8x return. Does that math work?"</li>
+          </ol>
+
+          <h4>When NOT to use value-based pricing</h4>
+          <ul>
+            <li>On Fiverr / Upwork — buyers there are price-shopping, not outcome-shopping.</li>
+            <li>For productized services (thumbnails, clips) — just use flat rates.</li>
+            <li>When the client's business is so small the numbers don't hold up.</li>
+          </ul>
+        </article>
+
+        <!-- LESSON 7.3 -->
+        <article class="lesson" id="l7-3">
+          <div class="lesson-num">LESSON 7.3</div>
+          <h3>Retainers — how to build monthly income that doesn't disappear</h3>
+
+          <p>One $800 project pays once. One $800/mo retainer pays 12 times. Every student business should be trying to convert project work into retainers by Month 2.</p>
+
+          <h4>Services that retainer well</h4>
+          <ul>
+            <li>Video clipping and short-form editing</li>
+            <li>Thumbnail design (monthly packs)</li>
+            <li>Podcast editing (weekly or biweekly)</li>
+            <li>Social media management</li>
+            <li>Newsletter ghostwriting</li>
+            <li>Lead generation (monthly list)</li>
+            <li>Website maintenance and edits</li>
+          </ul>
+
+          <h4>How to pitch a retainer (after one successful project)</h4>
+          <p>Two weeks after delivering a great one-off project, send this message:</p>
+
+          <div class="script">
+<span class="script-body">
+Hey [Name] — quick thought. The [first project] went well. Rather than quoting you one-off every month, I can just set up a fixed monthly package — [specific deliverable, e.g., "10 thumbnails and 3 channel strategy calls"] for $[rate]/month.
+
+Cancel anytime, no contract. It's simpler for both of us and usually ends up cheaper than project pricing over the year.
+
+Want me to send a rough breakdown?
+</span>
+</div>
+
+          <h4>Retainer structure for students</h4>
+          <ul>
+            <li><strong>Billing:</strong> Stripe auto-charge on the 1st of every month.</li>
+            <li><strong>Scope:</strong> named deliverables, not "unlimited." Unlimited is how you burn out.</li>
+            <li><strong>Length:</strong> monthly, cancel-anytime. Long contracts scare small clients.</li>
+            <li><strong>Communication:</strong> one standing weekly check-in. No open Slack access until Month 3.</li>
+          </ul>
+
+          <div class="callout">
+            <div class="callout-tag">The 3-retainer milestone</div>
+            <p>Once you have 3 retainers of $800/mo each, you're at $2,400/mo recurring — more than most part-time jobs available to college students in the US. That's the moment the business stops being a hobby and becomes real income.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 7.4 -->
+        <article class="lesson" id="l7-4">
+          <div class="lesson-num">LESSON 7.4</div>
+          <h3>Raising prices — when, how, and how much</h3>
+
+          <p>Every student undercharges. Every student is also terrified of raising rates. Here's the framework.</p>
+
+          <h4>The 5 signals you should raise prices</h4>
+          <ol>
+            <li>Your close rate on discovery calls is above <strong>50%</strong>.</li>
+            <li>You're booked out for <strong>2+ weeks</strong> ahead.</li>
+            <li>You've had <strong>3+ clients</strong> say yes without negotiating.</li>
+            <li>You've delivered at least <strong>5 complete projects</strong> in your service.</li>
+            <li>You're beginning to resent clients at their current rate.</li>
+          </ol>
+
+          <h4>How much to raise</h4>
+          <p>First raise: <strong>30–50%</strong>. Yes, that much. If you were charging $500 for a project, charge $750. New clients will accept it because they didn't know the old price. You won't lose any close rate until you're 2–3x above your original.</p>
+
+          <h4>Raising prices on existing retainer clients</h4>
+          <p>Send this 30 days before the new rate takes effect:</p>
+
+          <div class="script">
+<span class="script-body">
+Hey [Name] — heads up, I'm adjusting rates across the board starting [date]. Your retainer will move from $[old] to $[new].
+
+Your scope and everything else stays the same — this is just a regular annual adjustment. If it doesn't work for you, we can always discuss. But I wanted to give you plenty of notice.
+</span>
+</div>
+
+          <p>Expected outcome: 80%+ of retainer clients accept. The ones who leave were probably going to churn anyway. Net result is always positive.</p>
+
+          <h4>The "grandfather" trap</h4>
+          <p>Don't let old clients stay at old rates forever. Every 12 months, raise. If you're too scared to raise on a long-time client, you have a mindset problem, not a pricing problem.</p>
+
+          <div class="action-box">
+            <div class="action-tag">★ This Month's Action</div>
+            <ul>
+              <li>Audit your current rates against the 2026 benchmark table.</li>
+              <li>Set your first real-client rate (post-portfolio) to <strong>at least median beginner rate</strong>.</li>
+              <li>Set a calendar reminder: "raise rates" — 90 days from today.</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CHAPTER 8 — SCALING -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="ch8">
+        <div class="chapter-head">
+          <div class="chapter-tag">Chapter 08 · Scaling</div>
+          <h2>From one client to <em>a real business</em>.</h2>
+        </div>
+
+        <!-- LESSON 8.1 -->
+        <article class="lesson" id="l8-1">
+          <div class="lesson-num">LESSON 8.1</div>
+          <h3>From 1 client to 10 — the scaling path</h3>
+
+          <p>Your first client is a proof-of-concept. Your tenth is a business. The path between them is predictable — here's what it actually looks like.</p>
+
+          <h4>Months 1–2: Get to 2 clients</h4>
+          <p>This is the hardest stretch. You're sending outreach with no social proof, an awkward portfolio, and shaky pricing. The single goal: deliver two complete projects that generate two testimonials. Nothing else matters.</p>
+
+          <h4>Months 3–4: Grow to 5 clients</h4>
+          <p>Now things compound. Each client sends 0.5–1 referrals on average if you ask properly. Your portfolio has real work. Your DMs convert better. Close rate doubles. This is also when you start converting project work into retainers.</p>
+
+          <h4>Months 5–6: Push to 10 clients</h4>
+          <p>At 5 clients, you'll feel the first squeeze — too much work, not enough systems. This is where students panic. The answer isn't more hours. It's <strong>templates, SOPs, and saying no</strong>.</p>
+
+          <h4>How to ask for referrals (the only script you need)</h4>
+
+          <div class="script">
+<span class="script-body">
+Hey [Name] — glad we're wrapping this up strong.
+
+Quick favor: I'm looking to take on 2 more clients like you in the next month. If anyone comes to mind, I'd really appreciate an intro. Even a forwarded email works.
+
+If it helps, here's a one-liner you can paste: "[your tagline]. Here's their site: [link]."
+</span>
+<div class="script-note">Send this within 24 hours of project completion, while the glow is still fresh.</div>
+          </div>
+
+          <h4>The referral flywheel at 10 clients</h4>
+          <p>Assume each client refers 0.7 others on average. 10 clients × 0.7 = 7 referrals per year, at 50%+ close rate = ~3–4 new clients from pure referrals. At that point, outreach becomes optional.</p>
+
+          <div class="callout">
+            <div class="callout-tag">The hidden rule</div>
+            <p>Most freelance businesses die between client #3 and client #7. That's the danger zone — you're overwhelmed by work but not yet big enough for systems. Get through it by <strong>saying no</strong> to anything outside your exact service.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 8.2 -->
+        <article class="lesson" id="l8-2">
+          <div class="lesson-num">LESSON 8.2</div>
+          <h3>Time management — school + clients without burning out</h3>
+
+          <p>Every student business that fails, fails for the same reason: the student burns out, not the business. Here's the real framework.</p>
+
+          <h4>The 3-block week</h4>
+          <p>Divide every week into three buckets. Never mix them on the same day.</p>
+          <ul>
+            <li><strong>Deep work block (client delivery):</strong> 2–3 longer sessions per week. 3–5 hours each. Your best time of day.</li>
+            <li><strong>Sales block (outreach + calls):</strong> 2 shorter sessions. 45–90 minutes each. Mornings or late evenings.</li>
+            <li><strong>Admin block (invoicing, email, planning):</strong> 1 session of ~60 minutes. Friday afternoons work well.</li>
+          </ul>
+
+          <h4>Protect school first (seriously)</h4>
+          <ul>
+            <li>Never miss a deadline you've committed to a professor for a deadline you've committed to a client. Your degree compounds longer than any single project.</li>
+            <li>During midterms and finals, <strong>pause new outreach</strong>. Keep existing clients happy. Resume outreach in Week 2 of the next term.</li>
+            <li>Block exam weeks on your Calendly so you can't accidentally book a sales call during them.</li>
+          </ul>
+
+          <h4>The non-negotiables</h4>
+          <ul>
+            <li>One day a week completely off. No clients, no outreach, no checking email.</li>
+            <li>7+ hours of sleep. Sleep debt kills both grades and creative output.</li>
+            <li>Exercise 3x a week, even if it's just walking. This is performance maintenance, not optional.</li>
+          </ul>
+
+          <div class="callout callout-warn">
+            <div class="callout-tag">Red flag checklist</div>
+            <p>If you find yourself answering client DMs during lectures, working past 1 a.m. more than twice a week, or dreading logging into your dashboard — slow down. Fire your worst client or raise prices. Burnout at 20 sets you back years.</p>
+          </div>
+        </article>
+
+        <!-- LESSON 8.3 -->
+        <article class="lesson" id="l8-3">
+          <div class="lesson-num">LESSON 8.3</div>
+          <h3>Productize — turn your service into a scalable income stream</h3>
+
+          <p>At some point, selling your time hits a ceiling. You can't deliver more than 40 hours a week of client work and still be a student. That's when you productize.</p>
+
+          <h4>What productizing actually means</h4>
+          <p>It means turning your <strong>service</strong> (custom, time-based, client-specific) into a <strong>product</strong> (fixed scope, fixed price, predictable deliverable). Same skill, smaller custom work, higher volume.</p>
+
+          <h4>Three productization paths for students</h4>
+
+          <ol>
+            <li><strong>Fixed-scope service packages.</strong> Instead of "I'll edit your videos," sell "10 short-form edits per month, delivered in 48 hours, $800/mo." Clients love certainty. You love repeatable processes.</li>
+            <li><strong>Digital products.</strong> Once you've built 20 Notion workspaces, package one as a $49 template. Once you've written 30 newsletter issues, sell a "newsletter framework" guide. Use the reps as product R&D.</li>
+            <li><strong>Small agency layer.</strong> Hire one junior freelancer to handle delivery while you handle sales. Markup their rate 2–3x. This is how teens become 6-figure operators by year 2.</li>
+          </ol>
+
+          <h4>Where Whop and similar platforms fit</h4>
+          <p>Platforms like Whop let you bundle your templates, SOPs, outreach scripts, and community into a single digital product — priced $49, $97, or $197. If you've been successful at your service for 6+ months, you have enough proof to sell the <strong>how</strong> to other students. This course you're reading right now is an example of that pattern.</p>
+
+          <h4>The realistic productization timeline</h4>
+          <ul>
+            <li><strong>Month 1–6:</strong> Do the service. Take notes. Document everything.</li>
+            <li><strong>Month 6–9:</strong> Convert top clients to productized packages. Hire your first helper.</li>
+            <li><strong>Month 9–12:</strong> Launch a digital product (template, guide, or course) on Whop, Gumroad, or similar.</li>
+            <li><strong>Year 2:</strong> Mix of services + products. Revenue no longer capped by your hours.</li>
+          </ul>
+
+          <div class="action-box">
+            <div class="action-tag">★ The Long Game</div>
+            <ul>
+              <li>Month 1 goal: <strong>first client.</strong></li>
+              <li>Month 3 goal: <strong>$2K revenue.</strong></li>
+              <li>Month 6 goal: <strong>3 retainers totaling $3K+/mo.</strong></li>
+              <li>Month 12 goal: <strong>$5K+/mo mix of retainers and one small digital product.</strong></li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- QUIZ SECTION -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="quiz">
+        <div class="chapter-head">
+          <div class="chapter-tag">Interactive · 20 Questions</div>
+          <h2>The <em>Service Match</em> quiz.</h2>
+        </div>
+
+        <p style="margin-bottom: 28px; color: var(--ink-dim);">Answer honestly, not aspirationally. At the end, add up your points in each of the five categories: <strong>Technical, Creative, Communicator, Analytical, Entrepreneurial</strong>. The highest category maps to your ideal service profile from Chapter 2.</p>
+
+        <!-- Q1 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 01</div>
+          <div class="quiz-text">When something breaks on your phone or laptop, what do you do?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>I open it up and try to fix it myself.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>I look up solutions and methodically try them.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I ask a friend who knows how to fix it.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>I figure out a workaround and keep moving.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 02</div>
+          <div class="quiz-text">You're given 30 minutes to kill. What do you naturally reach for?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Design something — edit a photo, mess with a template.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Read or watch something to learn a new skill.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Text friends or hop on a call.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Plan a small side project or brainstorm ideas.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 03</div>
+          <div class="quiz-text">Which of these sounds most satisfying?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Writing a script that automates something tedious.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Making a video or visual that people love.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Convincing someone to see things your way.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Spotting a pattern in data nobody else noticed.<span class="quiz-pts">Analytical +2</span></div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 04</div>
+          <div class="quiz-text">How comfortable are you on a camera or voice call with a stranger?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Very — I thrive on calls.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Fine if I'm prepared.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I'd rather send a Loom or email.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Only if I'm selling something I believe in.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 05</div>
+          <div class="quiz-text">How many hours per week can you realistically put into this?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Under 6 hours.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>6–12 hours.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>12–20 hours.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>20+ hours, I'm going hard.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 06</div>
+          <div class="quiz-text">Pick your dream first client.</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>A tech SaaS founder with a messy backend.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>A YouTuber or podcast host.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>A coach or consultant building a personal brand.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>An agency owner running lots of accounts.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 07</div>
+          <div class="quiz-text">Which of these types of work excites you most?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Solving a tricky logic problem.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Making something beautiful that didn't exist before.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Writing something that moves people.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Building a process that scales without you.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 08</div>
+          <div class="quiz-text">How do you feel about spreadsheets?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Love them. Can VLOOKUP without googling.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Neutral — they're a tool.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I'd rather do anything else.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Fine if I'm tracking a project I care about.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 09</div>
+          <div class="quiz-text">When you scroll TikTok or Instagram, what catches your attention?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Visual aesthetics — editing, typography, color.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Storytelling and delivery.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>The business behind the creator.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>How the algorithm pushes specific content.<span class="quiz-pts">Analytical +2</span></div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 10</div>
+          <div class="quiz-text">How do you handle rejection (an unopened DM, a ghosted lead)?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Totally fine — send 10 more.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Analyze why and adjust my approach.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Stings a bit but I keep going.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>I'd rather avoid pitches in the first place.<span class="quiz-pts">Creative +2</span></div>
+        </div>
+
+        <!-- Q11 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 11</div>
+          <div class="quiz-text">What do you like more about a project?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>The building — actually making the thing.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>The design — making it look right.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>The selling — getting someone to buy in.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>The explaining — teaching the client.<span class="quiz-pts">Communicator +2</span></div>
+        </div>
+
+        <!-- Q12 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 12</div>
+          <div class="quiz-text">Pick your ideal deliverable style.</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>A finished video or image.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>A spreadsheet, list, or structured report.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>A functioning system or automation.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>A piece of written content.<span class="quiz-pts">Communicator +2</span></div>
+        </div>
+
+        <!-- Q13 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 13</div>
+          <div class="quiz-text">How quickly do you want to see your first $100?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>This week, even if the work is simple.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Within a month, done correctly.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I'm okay waiting 2 months if the craft is right.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>I care more about who my first client is than how fast.<span class="quiz-pts">Communicator +2</span></div>
+        </div>
+
+        <!-- Q14 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 14</div>
+          <div class="quiz-text">What's your relationship with deadlines?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>I schedule everything early.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>I work better under pressure.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I negotiate realistic ones and hit them.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>I set them myself and beat them.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q15 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 15</div>
+          <div class="quiz-text">Which existing skill is strongest in your life right now?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Coding, tools, or tech problem-solving.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Visual design, photography, video.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Writing, talking, persuading.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Research, organizing, planning.<span class="quiz-pts">Analytical +2</span></div>
+        </div>
+
+        <!-- Q16 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 16</div>
+          <div class="quiz-text">How do you want to feel about your work?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Proud of the craft.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>In control of the system.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Connected to the clients.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Building toward something bigger.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q17 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 17</div>
+          <div class="quiz-text">What annoys you most at your current job or school?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Bad tools, slow systems.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Ugly design, sloppy output.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Bad communication.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Wasted opportunity.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- Q18 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 18</div>
+          <div class="quiz-text">If a client asks for something outside your scope, you…</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>Figure out if I can learn it in a day and say yes.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>Say no and stay focused.<span class="quiz-pts">Analytical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>Try it because it sounds interesting.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Refer them to someone I know.<span class="quiz-pts">Communicator +2</span></div>
+        </div>
+
+        <!-- Q19 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 19</div>
+          <div class="quiz-text">How do you feel about building a personal brand?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>I'd rather hide and let the work speak.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>I'm into it — post weekly.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>I can do it if it drives leads.<span class="quiz-pts">Entrepreneurial +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>Only if I have something real to show.<span class="quiz-pts">Creative +2</span></div>
+        </div>
+
+        <!-- Q20 -->
+        <div class="quiz-q">
+          <div class="quiz-num">Question 20</div>
+          <div class="quiz-text">Which outcome would make you happiest in 6 months?</div>
+          <div class="quiz-opt"><span class="quiz-letter">A</span>A single $5K/mo automated system I built.<span class="quiz-pts">Technical +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">B</span>A portfolio so strong clients chase me.<span class="quiz-pts">Creative +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">C</span>A handful of happy clients who keep paying me.<span class="quiz-pts">Communicator +2</span></div>
+          <div class="quiz-opt"><span class="quiz-letter">D</span>A mini-business with 1–2 people helping me.<span class="quiz-pts">Entrepreneurial +2</span></div>
+        </div>
+
+        <!-- SCORING -->
+        <div class="action-box" style="margin-top: 40px;">
+          <div class="action-tag">★ Scoring Key</div>
+          <p style="color: var(--ink); margin-bottom: 14px;">Add up your points in each of the 5 categories. Your highest category points to your ideal service profile:</p>
+          <ul style="color: var(--ink);">
+            <li><strong>Technical winner →</strong> AI Automation, Cold Email Infra, Data Scraping, Website Editing, Prompt Engineering.</li>
+            <li><strong>Creative winner →</strong> Thumbnails, Short-Form Editing, Logo Design, Framer/Webflow, UGC.</li>
+            <li><strong>Communicator winner →</strong> Newsletter Ghostwriting, Social Media, SEO Blog Writing, Niche VA, Resume/LinkedIn.</li>
+            <li><strong>Analytical winner →</strong> Lead Gen, Data Scraping, Notion Systems, Automation, Cold Email Infra.</li>
+            <li><strong>Entrepreneurial winner →</strong> Social Media, Website Editing, Automation, Productized Thumbnails, Agency-style services.</li>
+          </ul>
+          <p style="color: var(--ink); margin-top: 14px;">If two categories are tied, default to the more <strong>visual</strong> one — it's easier to market as a student.</p>
+        </div>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- TEMPLATE FILES -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="files">
+        <div class="chapter-head">
+          <div class="chapter-tag">Template Files · Ready to Copy</div>
+          <h2>Five files you can <em>use today</em>.</h2>
+        </div>
+
+        <p style="margin-bottom: 28px; color: var(--ink-dim);">These are the templates referenced throughout the course. Copy directly into your own docs — all content is yours to use, edit, and send.</p>
+
+        <!-- FILE 1: COLD DM SCRIPTS -->
+        <article class="lesson" id="file-dm">
+          <div class="lesson-num">FILE 01 · cold-dm-scripts.md</div>
+          <h3>10 Cold DM Scripts</h3>
+
+          <div class="script">
+<span class="script-label">DM 01 — X · Video Clipping Offer</span>
+<span class="script-body">Hey [Name], huge fan of your recent episode with [guest]. I edit short-form for creators in your niche and wanted to send you 3 sample clips (free) cut from that episode. Where should I drop them?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 02 — X · Thumbnail Redesign</span>
+<span class="script-body">Hey [Name], noticed your last video underperformed relative to the others — I think the thumbnail's doing you dirty. I'll redesign it free, you tell me if you want the rest of your backlog done at $60 each. Send?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 03 — LinkedIn · AI Automation</span>
+<span class="script-body">Hi [Name], saw [company] just raised / launched / posted. Congrats. I build automation systems that typically save teams your size 10–15 hrs/wk on ops. Worth a 15-min look, or should I send a Loom instead?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 04 — Instagram · UGC</span>
+<span class="script-body">Hey [Brand], just found you — love [specific product]. I make UGC for brands in your space and would love to shoot a free piece of content for you this week. If you like it, we can keep going. DM a yes?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 05 — X · Newsletter Ghostwriting</span>
+<span class="script-body">Hey [Name], your writing voice on X is already newsletter-ready. Are you publishing one? If not, I'd draft your first 3 issues in your voice free, then we talk retainer only if it works.</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 06 — Reddit · Service Recommendation Thread</span>
+<span class="script-body">Hey, saw your post looking for [service]. I do exactly this. Rather than pitch, here's my portfolio: [link]. If it looks like a fit, DM me. If not, no worries — good luck with the project.</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 07 — LinkedIn · Resume Optimization</span>
+<span class="script-body">Hi [Name], noticed you've been job-searching (promoted to open-to-work). I rewrite resumes and LinkedIn profiles for mid-career professionals — typical result is 3–5x more recruiter outreach within 2 weeks. Worth a free 15-min audit of your current one?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 08 — Discord · Community Lead</span>
+<span class="script-body">Hey, saw your comment about [pain point]. I actually help [niche] with exactly this. No pitch — just wanted to share a quick framework in case it helps: [link]. Happy to chat anytime.</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 09 — X · Web Design Service</span>
+<span class="script-body">Hey [Name], your landing page is strong but I think the hero section is burying the lede. I'd rework it (free) and send you 2 variants. If either works, my full-site rate is $1,200 flat. Interested?</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">DM 10 — Any Platform · Student Honesty</span>
+<span class="script-body">Hey [Name], being straight up: I'm a college student building my portfolio as a [service]. I'll do one project for you free this month in exchange for a testimonial if it's good. If you say yes, here's what I'd do: [1-sentence plan]. Worth a try?</span>
+          </div>
+        </article>
+
+        <!-- FILE 2: EMAIL TEMPLATES -->
+        <article class="lesson" id="file-email">
+          <div class="lesson-num">FILE 02 · email-templates.md</div>
+          <h3>10 Cold Email Templates</h3>
+
+          <div class="script">
+<span class="script-label">EMAIL 01 — "Quick question" opener</span>
+<span class="script-body">Subject: quick question about [company]
+
+Hi [Name], been reading [company]'s content for a while. Quick one — are you outsourcing [service] yet, or doing it in-house?
+
+I help [niche] with exactly this and typically [specific outcome]. If it's relevant, happy to send a 3-min Loom with a tailored approach. If not, ignore this.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 02 — "I made you something"</span>
+<span class="script-body">Subject: made you a thing
+
+Hi [Name], rewrote your homepage hero section (2 variants attached). Took 20 minutes.
+
+If either hits, use them free. If you want the rest of the site in that style, I charge $800 flat with 5-day delivery.
+
+Either way, enjoy.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 03 — Loom walkthrough</span>
+<span class="script-body">Subject: 3-minute Loom for [company]
+
+Hi [Name], made you a short walkthrough (3 min) of 2 automations I'd set up for your team: [Loom link].
+
+If it's useful, I'd build both for $900 flat. No response needed if not — I won't follow up.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 04 — Audit-first offer</span>
+<span class="script-body">Subject: free audit of [company]'s [channel]
+
+Hi [Name], I run free audits of [channel/system] for companies your size — usually find 3–5 things worth fixing in 30 minutes.
+
+Want me to run one for [company]? No pitch attached. If you want the fixes done after, we can talk rates then.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 05 — Social proof-led</span>
+<span class="script-body">Subject: helped [similar company] do X — open to chat?
+
+Hi [Name], recently helped [similar company / creator] [specific result]. Saw you're in a similar spot with [specific observation].
+
+Would a 15-min call make sense to see if the same approach fits? If not, no worries — I'll back off.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 06 — Specific observation</span>
+<span class="script-body">Subject: one thing I noticed about your [page/channel/product]
+
+Hi [Name], quick one — your [specific thing] is costing you conversions / clicks / signups. Specifically: [one clear observation].
+
+I fix this for [niche]. Usually a 2-day project, $500 flat. Want a Loom explaining exactly what I'd change?
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 07 — Mutual connection angle</span>
+<span class="script-body">Subject: [Mutual person / community] pointed me your way
+
+Hi [Name], [Mutual] / [community] pointed me toward your work. Loved [specific piece].
+
+Quick intro — I help [niche] with [service]. If you're ever looking for help with [specific pain], happy to chat. Otherwise, just wanted to say hi.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 08 — The 5-word subject line</span>
+<span class="script-body">Subject: Something for [company]
+
+Hi [Name],
+
+I put together a quick [sample / outline / doc] specifically for [company]'s situation: [link].
+
+If useful, let's talk. If not, delete this and I'll leave you alone.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 09 — The question-driven email</span>
+<span class="script-body">Subject: how are you handling [specific pain]?
+
+Hi [Name], curious — how is [company] handling [specific operational pain]?
+
+Asking because I've built systems for 3 similar companies and the pattern is pretty consistent. Happy to share what I've learned on a 15-min call, even if we never work together.
+
+[Your name]</span>
+          </div>
+
+          <div class="script">
+<span class="script-label">EMAIL 10 — The goodbye email</span>
+<span class="script-body">Subject: last note from me
+
+Hi [Name], I'm going to stop reaching out so I'm not cluttering your inbox.
+
+If [service] ever becomes relevant, you've got my email. Wishing you the best with [company] this quarter.
+
+[Your name]</span>
+          </div>
+        </article>
+
+        <!-- FILE 3: SERVICE PITCHES -->
+        <article class="lesson" id="file-pitch">
+          <div class="lesson-num">FILE 03 · service-pitch.md</div>
+          <h3>20 Service Pitches — One-Liners for Every Service</h3>
+
+          <p>Use these as your elevator pitch, LinkedIn headline, or DM opening line. Each is under 25 words.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Service</th><th>One-line pitch</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>1. Video Clipping</strong></td><td>I turn one podcast episode into 10+ vertical-ready clips per week for creators with 50k+ subs.</td></tr>
+                <tr><td><strong>2. Thumbnail Design</strong></td><td>I design scroll-stopping YouTube thumbnails for creators — $60 each, 48-hour turnaround, consistent style.</td></tr>
+                <tr><td><strong>3. Notion Workspaces</strong></td><td>I build custom Notion systems — CRMs, content calendars, dashboards — that founders actually keep using.</td></tr>
+                <tr><td><strong>4. AI Automation</strong></td><td>I connect your tools so they run without you — Zapier, Make, and custom AI workflows for SMBs.</td></tr>
+                <tr><td><strong>5. Website Editing</strong></td><td>I build and maintain Webflow and Framer sites for founders who want it to just work.</td></tr>
+                <tr><td><strong>6. Podcast Editing</strong></td><td>I edit weekly podcast episodes — clean cuts, music, show notes — so you can focus on the interview.</td></tr>
+                <tr><td><strong>7. Social Media</strong></td><td>I run Instagram and LinkedIn for wellness coaches — posts, captions, engagement, reports, done.</td></tr>
+                <tr><td><strong>8. Newsletter Ghostwriting</strong></td><td>I write weekly newsletters for B2B founders in your voice. You review, I handle the rest.</td></tr>
+                <tr><td><strong>9. Lead Generation</strong></td><td>I build verified, targeted lead lists for B2B sales teams — 500+ high-quality prospects per month.</td></tr>
+                <tr><td><strong>10. Data Scraping</strong></td><td>I extract structured data from public websites into clean, usable spreadsheets — one-off or recurring.</td></tr>
+                <tr><td><strong>11. Cold Email Infra</strong></td><td>I set up multi-domain cold email systems with 90%+ deliverability for agencies scaling outbound.</td></tr>
+                <tr><td><strong>12. UGC Creation</strong></td><td>I create authentic-looking TikToks and Reels for DTC brands — you use them in your ads.</td></tr>
+                <tr><td><strong>13. Virtual Assistant</strong></td><td>I handle inbox, scheduling, and research for real estate agents so you can sell more houses.</td></tr>
+                <tr><td><strong>14. Resume/LinkedIn</strong></td><td>I rewrite resumes and LinkedIn profiles for mid-career professionals getting interviewed 3x more often.</td></tr>
+                <tr><td><strong>15. SEO Blog Writing</strong></td><td>I write SEO-optimized blog articles for SaaS founders who want to rank without outsourcing their voice.</td></tr>
+                <tr><td><strong>16. Logo & Brand</strong></td><td>I design clean logo sets and basic brand kits for early-stage startups in under 7 days.</td></tr>
+                <tr><td><strong>17. Tutoring</strong></td><td>I tutor high-school students in AP Math and Chem — Ivy-bound students, 1-hour online sessions.</td></tr>
+                <tr><td><strong>18. Prompt Engineering</strong></td><td>I build internal GPTs for small businesses — customer support, content, ops — that run without a team.</td></tr>
+                <tr><td><strong>19. Voiceover Services</strong></td><td>I produce professional voiceovers for explainer videos, YouTube channels, and e-learning courses.</td></tr>
+                <tr><td><strong>20. Short-Form Editing</strong></td><td>I do full short-form edits for creators — captions, b-roll, motion graphics — retainer or per-video.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- FILE 4: PRICING CALCULATOR -->
+        <article class="lesson" id="file-pricing">
+          <div class="lesson-num">FILE 04 · pricing-calculator.md</div>
+          <h3>Pricing Calculator</h3>
+
+          <h4>The student freelance pricing formula</h4>
+          <p>Use this simple formula to set a defensible price for any project:</p>
+
+          <div class="script">
+<span class="script-body"><strong>Project Price = (Hours × Target Hourly Rate) + Complexity Premium + Risk Buffer</strong>
+
+Where:
+- Hours = realistic delivery time (double your first estimate)
+- Target Hourly Rate = $30 (starter) / $60 (post-3 clients) / $100+ (experienced)
+- Complexity Premium = 20–40% if project has tight deadline, unclear scope, or high visibility
+- Risk Buffer = 15% flat, for revisions and scope creep</span>
+          </div>
+
+          <h4>Quick-reference pricing ladder (2026 US rates)</h4>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Experience Level</th><th>Hourly Equivalent</th><th>Day Rate</th><th>Weekly Retainer</th><th>Monthly Retainer</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Starter (0–3 clients)</strong></td><td>$25–$40</td><td>$200–$320</td><td>$400–$650</td><td>$600–$1,200</td></tr>
+                <tr><td><strong>Working (4–10 clients)</strong></td><td>$50–$80</td><td>$400–$640</td><td>$800–$1,200</td><td>$1,500–$2,500</td></tr>
+                <tr><td><strong>Experienced (10+ clients)</strong></td><td>$85–$150</td><td>$700–$1,200</td><td>$1,500–$2,500</td><td>$3,000–$6,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>The price-test script (for discovery calls)</h4>
+          <div class="script">
+<span class="script-body">"Based on what you've shared, I'd quote this at $X flat. For context, this reflects [specific deliverable 1], [specific deliverable 2], and [timeline]. Is that in the range you were expecting, or should I scope it differently?"</span>
+          </div>
+
+          <h4>The three most important rules</h4>
+          <ul>
+            <li><strong>Always quote flat rates, never hourly.</strong> Hourly invites micromanagement and caps your income.</li>
+            <li><strong>Quote in writing within 24 hours of the call.</strong> Memory fades fast.</li>
+            <li><strong>Never negotiate down more than 15%.</strong> If they push harder, remove scope instead of cutting price.</li>
+          </ul>
+        </article>
+
+        <!-- FILE 5: WEEKLY TRACKER -->
+        <article class="lesson" id="file-tracker">
+          <div class="lesson-num">FILE 05 · weekly-tracker.md</div>
+          <h3>Weekly Execution Dashboard</h3>
+
+          <p>Rebuild this in Notion or Google Sheets in about 10 minutes. Fill it every Sunday.</p>
+
+          <h4>Learning section</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Metric</th><th>This Week</th><th>Target</th></tr></thead>
+              <tbody>
+                <tr><td>Hours studied</td><td>___</td><td>5+</td></tr>
+                <tr><td>Courses or videos completed</td><td>___</td><td>3+</td></tr>
+                <tr><td>New tools learned / practiced</td><td>___</td><td>1+</td></tr>
+                <tr><td>Portfolio pieces created</td><td>___</td><td>1 (Weeks 2–3)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Outreach section</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Metric</th><th>This Week</th><th>Target</th></tr></thead>
+              <tbody>
+                <tr><td>DMs sent</td><td>___</td><td>50+</td></tr>
+                <tr><td>Cold emails sent</td><td>___</td><td>50+</td></tr>
+                <tr><td>LinkedIn connections requested</td><td>___</td><td>25+</td></tr>
+                <tr><td>Replies received</td><td>___</td><td>3+</td></tr>
+                <tr><td>Calls booked</td><td>___</td><td>1+</td></tr>
+                <tr><td>Follow-ups sent</td><td>___</td><td>30+</td></tr>
+                <tr><td>Reply rate (%)</td><td>___</td><td>2–5%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Clients section</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Metric</th><th>This Week</th><th>Target</th></tr></thead>
+              <tbody>
+                <tr><td>Prospects in pipeline</td><td>___</td><td>5+</td></tr>
+                <tr><td>Proposals / quotes sent</td><td>___</td><td>2+</td></tr>
+                <tr><td>New clients closed</td><td>___</td><td>1+ by Day 30</td></tr>
+                <tr><td>Active clients (total)</td><td>___</td><td>Track monthly</td></tr>
+                <tr><td>Client churn this week</td><td>___</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Revenue section</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Metric</th><th>This Week</th><th>Target (Month 3)</th></tr></thead>
+              <tbody>
+                <tr><td>Revenue this week ($)</td><td>___</td><td>$500+</td></tr>
+                <tr><td>Revenue this month ($)</td><td>___</td><td>$2,000+</td></tr>
+                <tr><td>Avg project value ($)</td><td>___</td><td>$300+</td></tr>
+                <tr><td>MRR (monthly recurring)</td><td>___</td><td>$1,500+</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Sunday reflection (3 questions)</h4>
+          <ol>
+            <li><strong>What worked this week?</strong> (Keep doing it.)</li>
+            <li><strong>What didn't work?</strong> (Kill it next week.)</li>
+            <li><strong>What's the one thing I'll change next week?</strong> (Pick one. Only one.)</li>
+          </ol>
+
+          <div class="callout">
+            <div class="callout-tag">The only metric that matters in Month 1</div>
+            <p>Outreach volume. Not income, not skill improvements, not portfolio polish. Send 100 messages a week. Nothing else until you hit that number consistently.</p>
+          </div>
+        </article>
+      </section>
+
+
+      <!-- ========================================================== -->
+      <!-- CLOSING -->
+      <!-- ========================================================== -->
+      <section class="chapter" id="closing">
+        <div class="chapter-head">
+          <div class="chapter-tag">Closing</div>
+          <h2>You now have <em>more</em> than most people who charge $2K for this.</h2>
+        </div>
+
+        <p>The information isn't the hard part. It never was. You've just read the entire playbook in a single sitting, and you could probably teach half of it to a friend tomorrow.</p>
+
+        <p>The hard part is doing it. Picking one service and not picking again. Sending 100 messages when the first 30 go unanswered. Delivering a project at 2 a.m. because you promised a client you would. Charging $500 when every voice in your head says $100 feels safer.</p>
+
+        <p>Every student who builds a real micro-service business has done these unglamorous things for 90 days straight. There is no hack. There is no "one weird trick." The trick is the 90 days.</p>
+
+        <p>If you follow the weekly structure in this course — one chapter per week, one hour per day — you will be in a different place on Day 31 than you are today. You will have skill, a portfolio, a quote-able rate, and your first client. That's not a promise about the future; it's just math on consistent input.</p>
+
+        <p><strong>Close this tab. Pick your service. Start Chapter 3 tomorrow morning.</strong></p>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- FINAL PROMO -->
+      <!-- ========================================================== -->
+      <div class="promo">
+        <div class="promo-tag">★ One Last Thing</div>
+        <h4>This course handles the next <em>30 days</em>. Career GPS handles the next 12 months.</h4>
+        <p>Student Money Engine gets you to your first paying client. But income alone doesn't answer the question a lot of students are quietly carrying: <em>am I even on the right path?</em> If you've ever suspected your major isn't the right one, or you're not sure where the next year should go, Career GPS builds you a fully personalized 12-month roadmap based on who you actually are — not who your degree says you should be.</p>
+        <div class="promo-links">
+          <a href="https://getcareergps.com" target="_blank" rel="noopener" class="promo-btn">Try Career GPS <span class="arrow">→</span></a>
+          <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" class="promo-btn secondary">Get it on Gumroad <span class="arrow">→</span></a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="brand-foot">Student Money Engine</div>
+  <div>A complete course for the 2026 student economy · Built for Whop</div>
+  <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line-soft); font-size: 12px;">
+    Recommended: <a href="https://getcareergps.com" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(232, 255, 91, 0.3); padding-bottom: 1px;">Career GPS</a> — your personalized 12-month career roadmap · also on <a href="https://elimdal.gumroad.com/l/dtell" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(232, 255, 91, 0.3); padding-bottom: 1px;">Gumroad</a>
+  </div>
+</footer>
+
+</body>
+</html>
