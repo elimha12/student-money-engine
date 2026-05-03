@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>VivaVials - Sort the Colors!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+
+<!-- Splash Screen -->
+<div id="splash-screen">
+  <div class="splash-content">
+    <div class="logo-container">
+      <div class="vial-logo">
+        <div class="vial-tube">
+          <div class="liquid-layer liquid-red"></div>
+          <div class="liquid-layer liquid-blue"></div>
+          <div class="liquid-layer liquid-green"></div>
+        </div>
+        <div class="logo-sparkle sparkle-1">✨</div>
+        <div class="logo-sparkle sparkle-2">⭐</div>
+        <div class="logo-sparkle sparkle-3">💫</div>
+      </div>
+      <h1 class="game-title">VivaVials</h1>
+      <p class="game-subtitle">🧪 Sort the Colors, Master the Challenge! 🌈</p>
+    </div>
+    <button id="start-game-btn" class="start-button">
+      🎮 START GAME
+    </button>
+    <div class="loading-text">Loading amazing color-sorting experience...</div>
+  </div>
+</div>
+
+<div class="game-container" id="game-container" style="display: none;">
+  <div class="game-header">
+    <div class="brand-logo">
+      <span class="brand-icon">🧪</span>
+      <span class="brand-text">VivaVials</span>
+    </div>
+    <div class="game-info">
+      <div id="levelDisplay" class="info-item">Level: 1</div>
+      <div id="scoreDisplay" class="info-item">Score: 0</div>
+    </div>
+  </div>
+
+  <div id="message" class="game-message"></div>
+
+  <div id="game" class="game-board"></div>
+
+  <div id="controls" class="game-controls">
+    <button id="undoBtn" class="control-btn undo-btn" disabled>
+      <span class="btn-icon">↩️</span>
+      <span class="btn-text">Undo (5 left)</span>
+    </button>
+    <button id="resetBtn" class="control-btn reset-btn">
+      <span class="btn-icon">🔄</span>
+      <span class="btn-text">Reset Level</span>
+    </button>
+    <button id="colorSwapBtn" class="control-btn swap-btn">
+      <span class="btn-icon">🎨</span>
+      <span class="btn-text">Color Swap</span>
+    </button>
+    <button id="nextLevelBtn" class="control-btn next-btn" disabled>
+      <span class="btn-icon">▶️</span>
+      <span class="btn-text">Next Level</span>
+    </button>
+  </div>
+</div>
+
+<div id="successQuote" class="success-quote"></div>
+
+<!-- Enhanced Tutorial Overlay -->
+<div id="tutorial-overlay" class="tutorial-overlay">
+  <div id="tutorial-content" class="tutorial-content">
+    <div class="tutorial-header">
+      <div class="tutorial-logo">🧪</div>
+      <h2>Welcome to VivaVials!</h2>
+      <p class="tutorial-subtitle">Master the Art of Color Sorting</p>
+    </div>
+
+    <div class="tutorial-steps">
+      <div class="tutorial-step">
+        <div class="step-icon">🎯</div>
+        <div class="step-content">
+          <h3>Goal</h3>
+          <p>Sort colored blocks into vials so each vial contains only one color (5 blocks per color).</p>
+        </div>
+      </div>
+
+      <div class="tutorial-step">
+        <div class="step-icon">🖱️</div>
+        <div class="step-content">
+          <h3>How to Play</h3>
+          <p>Click a vial to select it, then click another vial to pour blocks between them.</p>
+        </div>
+      </div>
+
+      <div class="tutorial-step">
+        <div class="step-icon">📋</div>
+        <div class="step-content">
+          <h3>Rules</h3>
+          <ul>
+            <li>You can only pour blocks on top of the same color or into empty vials</li>
+            <li>You can only move the top blocks from a vial</li>
+            <li>Use special powers like Color Swap and Undo wisely!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tutorial-step">
+        <div class="step-icon">⭐</div>
+        <div class="step-content">
+          <h3>Tutorial Mode</h3>
+          <p>Watch how the game is played! The bot will solve the first puzzle automatically to teach you!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-actions">
+      <button id="tutorial-skip" class="tutorial-btn primary">
+        🚀 Start Tutorial Now!
+      </button>
+      <p class="tutorial-note">💡 Real gameplay starts from Level 2!</p>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+<!-- Emergency Game Starter for CrazyGames compatibility -->
+<script>
+window.addEventListener("load", async () => {
+  console.log("🎮 VivaVials Emergency Starter Loading...");
+
+  try {
+    // SDK'yı başlat
+    await initCrazyGamesSDK();
+
+    // Oyun verilerini yükle  
+    const hasSaved = await loadGame();
+
+    // Oyunu render et
+    renderTubes();
+
+    // Game container'ı görünür yap
+    const gameContainer = document.getElementById("game-container");
+    if (gameContainer && gameContainer.style.display === "none") {
+      gameContainer.style.display = "flex";
+      gameContainer.style.opacity = "1";
+    }
+
+    // Splash screen'i gizle eğer hala görünürse
+    const splashScreen = document.getElementById("splash-screen");
+    if (splashScreen && splashScreen.style.display !== "none") {
+      splashScreen.style.display = "none";
+    }
+
+    console.log("✅ VivaVials Emergency Starter Completed!");
+
+  } catch (error) {
+    console.log("⚠️ Emergency starter error:", error);
+
+    // Fallback: Oyunu direkt başlat
+    try {
+      const gameContainer = document.getElementById("game-container");
+      const splashScreen = document.getElementById("splash-screen");
+
+      if (splashScreen) splashScreen.style.display = "none";
+      if (gameContainer) {
+        gameContainer.style.display = "flex";
+        gameContainer.style.opacity = "1";
+      }
+
+      // Temel oyun başlatma
+      if (typeof renderTubes === 'function') {
+        renderTubes();
+      }
+
+      console.log("🔄 VivaVials Fallback Starter Completed!");
+
+    } catch (fallbackError) {
+      console.error("❌ Fallback starter also failed:", fallbackError);
+    }
+  }
+});
+
+// CrazyGames-specific emergency render system
+setTimeout(() => {
+  const gameContainer = document.getElementById("game-container");
+  const gameDiv = document.getElementById("game");
+
+  if (gameContainer && gameContainer.style.display === "none") {
+    console.log("🚨 VivaVials 3-second force start!");
+
+    const splashScreen = document.getElementById("splash-screen");
+    if (splashScreen) splashScreen.style.display = "none";
+
+    gameContainer.style.display = "flex";
+    gameContainer.style.opacity = "1";
+
+    // Force render if needed
+    if (gameDiv && gameDiv.children.length === 0 && typeof renderTubes === 'function') {
+      renderTubes();
+    }
+  }
+}, 3000);
+
+// CrazyGames Super Emergency System
+setInterval(() => {
+  const gameDiv = document.getElementById("game");
+  const gameContainer = document.getElementById("game-container");
+
+  if (gameContainer && gameContainer.style.display !== "none" && 
+      gameDiv && gameDiv.children.length === 0 && 
+      typeof forceCrazyGamesRender === 'function') {
+    console.log("🚨 SUPER EMERGENCY: Activating CrazyGames force render!");
+    forceCrazyGamesRender();
+  }
+}, 5000);
+
+// Ultimate CrazyGames compatibility
+setTimeout(() => {
+  const gameDiv = document.getElementById("game");
+  if (gameDiv && gameDiv.children.length === 0) {
+    console.log("🔥 ULTIMATE EMERGENCY: Manual tube creation for CrazyGames");
+
+    gameDiv.innerHTML = `
+      <div class="tube" style="width:65px;height:260px;background:#fff;border-radius:32px;display:flex;flex-direction:column;margin:3px;padding:8px 5px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#ff4757;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#ff4757;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#ff4757;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#ff4757;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:transparent;border:2px dashed rgba(255,255,255,0.3);"></div>
+      </div>
+      <div class="tube" style="width:65px;height:260px;background:#fff;border-radius:32px;display:flex;flex-direction:column;margin:3px;padding:8px 5px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#3742fa;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#3742fa;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#3742fa;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#3742fa;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:transparent;border:2px dashed rgba(255,255,255,0.3);"></div>
+      </div>
+      <div class="tube" style="width:65px;height:260px;background:#fff;border-radius:32px;display:flex;flex-direction:column;margin:3px;padding:8px 5px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#2ed573;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#2ed573;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#2ed573;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:#2ed573;"></div>
+        <div style="height:40px;margin:2px 0;border-radius:12px;background:transparent;border:2px dashed rgba(255,255,255,0.3);"></div>
+      </div>
+    `;
+    gameDiv.style.display = 'flex';
+    gameDiv.style.justifyContent = 'center';
+    gameDiv.style.gap = '12px';
+
+    console.log("✅ ULTIMATE EMERGENCY: Manual tubes created for CrazyGames!");
+  }
+}, 8000);</script>
+
+</body>
+</html>
